@@ -1,18 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Api\AccessControl;
+namespace App\Http\Controllers\Api\V1\Users;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use Illuminate\Http\Request;
 
-class AuditLogController extends Controller
+class RoleController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $role = Role::all();
+        return response()->json([
+            'status'=>'successfully !',
+            'role'=> $role
+        ]);
     }
 
     /**
@@ -28,7 +33,11 @@ class AuditLogController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $role = Role::find($id);
+        return response([
+            'status'=>'successfully !',
+            'role'=> $role
+        ]);
     }
 
     /**
@@ -44,6 +53,14 @@ class AuditLogController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $role = Role::find($id);
+        if(!$role){
+            return response()->json(['message'=>'Role not found !', 404]);
+        }
+        $role->delete();
+        return response()->json([
+            'status'=>'Successfully !',
+            'role'=> $role
+        ]);
     }
 }

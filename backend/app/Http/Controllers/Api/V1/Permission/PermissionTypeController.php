@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\Notification;
+namespace App\Http\Controllers\Api\V1\Permission;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class NotificationController extends Controller
+class PermissionTypeController extends Controller
 {
     /**
      * Display a listing of the resource.

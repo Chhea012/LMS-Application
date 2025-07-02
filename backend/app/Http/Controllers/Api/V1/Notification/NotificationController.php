@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\Users;
+namespace App\Http\Controllers\Api\V1\Notification;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class RoleController extends Controller
+class NotificationController extends Controller
 {
     /**
      * Display a listing of the resource.

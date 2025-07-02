@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\Permission;
+namespace App\Http\Controllers\Api\V1\Users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class PermissionTypeController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.

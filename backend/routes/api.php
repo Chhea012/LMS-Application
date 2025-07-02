@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\Users\RoleController;
+use App\Http\Controllers\Api\V1\Users\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use PhpParser\Node\Expr\FuncCall;
@@ -21,6 +21,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::prefix('v1')->group(function (){
-    Route::apiResource('/role', RoleController::class);
+Route::prefix('v1')->group(function(){
+    Route::apiResource('/roles', RoleController::class);
 });

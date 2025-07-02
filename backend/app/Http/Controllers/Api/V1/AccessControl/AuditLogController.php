@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\Department;
+namespace App\Http\Controllers\Api\V1\AccessControl;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class DepartmentController extends Controller
+class AuditLogController extends Controller
 {
     /**
      * Display a listing of the resource.

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\AccessControl;
+namespace App\Http\Controllers\Api\V1\Department;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class AccessControlController extends Controller
+class DepartmentController extends Controller
 {
     /**
      * Display a listing of the resource.
