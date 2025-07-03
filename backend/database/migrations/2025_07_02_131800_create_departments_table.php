@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreign('head_user_id')->references('id')->on('users')->onDelete('set null');
+            $table->unsignedBigInteger('head_user_id')->nullable(); // No FK here yet
             $table->timestamps();
         });
     }
