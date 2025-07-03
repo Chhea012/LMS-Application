@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Department\DepartmentController;
+use App\Http\Controllers\Api\V1\Notification\NotificationController;
+
 use App\Http\Controllers\Api\V1\Permission\PermissionApprovalController;
 use App\Http\Controllers\Api\V1\Permission\PermissionRequestController;
 use App\Http\Controllers\Api\V1\Permission\PermissionTypeController;
@@ -32,4 +34,5 @@ Route::prefix('v1')->group(function(){
     Route::apiResource('department', DepartmentController::class);
     Route::apiResource('permissionrequests', PermissionRequestController::class);
     Route::apiResource('permissionapprovals', PermissionApprovalController::class);
+    Route::apiResource('notification', NotificationController::class);
 });
