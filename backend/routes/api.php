@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Permission\PermissionApprovalController;
 use App\Http\Controllers\Api\V1\Permission\PermissionRequestController;
 use App\Http\Controllers\Api\V1\Permission\PermissionTypeController;
 use App\Http\Controllers\Api\V1\Users\RoleController;
@@ -27,4 +28,5 @@ Route::prefix('v1')->group(function(){
     Route::apiResource('roles', RoleController::class);
     Route::apiResource('permissiontypes', PermissionTypeController::class);
     Route::apiResource('permissionrequests', PermissionRequestController::class);
+    Route::apiResource('permissionapprovals', PermissionApprovalController::class);
 });
