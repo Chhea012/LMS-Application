@@ -1,7 +1,3 @@
-<script setup>
-// NO layout imports here!
-</script>
-
 <template>
   <div class="flex h-screen">
     <Sidebar :isVisible="true" />
