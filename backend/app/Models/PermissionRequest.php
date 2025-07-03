@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class PermissionRequest extends Model
 {
@@ -23,5 +24,16 @@ class PermissionRequest extends Model
     public function approvals()
     {
         return $this->hasMany(PermissionApproval::class);
+    }
+    // Format created_at
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->format('F d, Y');
+    }
+
+    // Format updated_at
+    public function getUpdatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->format('F d, Y');
     }
 }

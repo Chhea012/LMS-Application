@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Api\V1\AccessControl;
 
 use App\Http\Controllers\Controller;
+use App\Models\PermissionAccess;
 use Illuminate\Http\Request;
 
-class AccessControlController extends Controller
+class PermissionAccessController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $permission = PermissionAccess::all();
+        return response( )->json($permission);
     }
 
     /**
