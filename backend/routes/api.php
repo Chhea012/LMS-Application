@@ -30,8 +30,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::prefix('v1')->group(function(){
-    Route::apiResource('/roles', RoleController::class);
-    Route::apiResource('/users', UserController::class);
+    Route::apiResource('roles', RoleController::class);
+    Route::apiResource('users', UserController::class);
     Route::apiResource('permissiontypes', PermissionTypeController::class);
     Route::apiResource('department', DepartmentController::class);
     Route::apiResource('permissionrequests', PermissionRequestController::class);
