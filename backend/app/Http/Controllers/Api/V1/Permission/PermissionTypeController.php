@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1\Permission;
 use App\Http\Controllers\Controller;
 use App\Models\PermissionType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class PermissionTypeController extends Controller
 {
@@ -23,16 +22,12 @@ class PermissionTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name' => 'required|string|max:255|unique:permission_types,name',
             'description' => 'nullable|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $type = PermissionType::create($validator->validated());
+        $type = PermissionType::create($validated);
 
         return response()->json([
             'message' => 'Permission type created successfully.',
@@ -65,23 +60,18 @@ class PermissionTypeController extends Controller
             return response()->json(['message' => 'Permission type not found.'], 404);
         }
 
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name' => 'required|string|max:255|unique:permission_types,name,' . $id,
             'description' => 'nullable|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $type->update($validator->validated());
+        $type->update($validated);
 
         return response()->json([
             'message' => 'Permission type updated successfully.',
             'data' => $type
         ]);
     }
-
 
     /**
      * Remove the specified resource from storage.
