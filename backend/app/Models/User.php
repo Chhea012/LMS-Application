@@ -4,14 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class User extends Model
 {
     use HasFactory;
+    // app/Models/User.php
+
     protected $fillable = [
-        'full_name', 'email', 'password', 'image',
-        'role_id', 'department_id', 'is_active'
+        'full_name',
+        'email',
+        'password',
+        'role_id',
+        'department_id',
+        'image',
     ];
+
+
+
 
     public function role()
     {
@@ -41,5 +51,16 @@ class User extends Model
     public function auditLogs()
     {
         return $this->hasMany(AuditLog::class);
+    }
+    // Format created_at
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->format('F d, Y');
+    }
+
+    // Format updated_at
+    public function getUpdatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->format('F d, Y');
     }
 }
