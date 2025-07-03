@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1\Department;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\Models\Department;
+
 class DepartmentController extends Controller
 {
     /**
@@ -12,7 +14,9 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json([
+            'department' => Department::all()
+        ], 200);
     }
 
     /**
@@ -20,7 +24,17 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'head_user_id' => 'nullable|exists:users,id',
+        ]);
+
+        $department = Department::create($validated);
+
+        return response()->json([
+            'message' => 'Department created successfully',
+            'department' => $department
+        ], 201);
     }
 
     /**
@@ -28,7 +42,10 @@ class DepartmentController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $department = Department::findOrFail($id);
+        return response()->json([
+            'department' => $department
+        ], 200);
     }
 
     /**
@@ -36,7 +53,26 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $department = Department::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'head_user_id' => 'nullable|exists:users,id',
+        ]);
+
+        try {
+            $department->update($validated);
+
+            return response()->json([
+                'message' => 'Department updated successfully',
+                'department' => $department
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update department',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -44,6 +80,19 @@ class DepartmentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $department = Department::findOrFail($id);
+        try {
+            $department->delete();
+
+            return response()->json([
+                'message' => 'Department deleted successfully',
+                'department' => $department
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete department',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
