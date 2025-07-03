@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Department\DepartmentController;
 use App\Http\Controllers\Api\V1\Permission\PermissionTypeController;
 use App\Http\Controllers\Api\V1\Users\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use PhpParser\Node\Expr\FuncCall;
+
+use App\Http\Controllers\Api\V1\Department;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,4 +28,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('v1')->group(function(){
     Route::apiResource('roles', RoleController::class);
     Route::apiResource('permissiontypes', PermissionTypeController::class);
+    Route::apiResource('department', DepartmentController::class);
 });
