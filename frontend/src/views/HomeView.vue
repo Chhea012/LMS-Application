@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen overflow-y-auto bg-gray-50">
+  <div class="h-screen overflow-y-auto bg-gray-50 scrollbar-hide">
     <div class="p-6">
       <!-- Header -->
       <header class="mb-8">
@@ -55,7 +55,7 @@
         <!-- Recent Activity -->
         <section class="lg:col-span-2 bg-white rounded-lg shadow border border-gray-200 p-6">
           <h3 class="text-2xl font-semibold text-gray-800 mb-4">Recent Activity</h3>
-          <ul class="divide-y divide-gray-200 max-h-72 overflow-y-auto">
+          <ul class="divide-y divide-gray-200 max-h-72 overflow-y-auto scrollbar-hide">
             <li class="py-3">
               <p class="text-gray-700"><span class="font-semibold">User John Doe</span> requested permission.</p>
               <p class="text-xs text-gray-500">2 hours ago</p>
@@ -90,5 +90,15 @@
 </template>
 
 <script setup>
-// Scroll logic not needed since native overflow is now allowed
+// No extra logic needed for scroll hiding
 </script>
+
+<style scoped>
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+</style>
