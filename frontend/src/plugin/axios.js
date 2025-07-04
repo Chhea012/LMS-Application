@@ -1,4 +1,3 @@
-// axios.js
 import axios from 'axios';
 
 const apiInstance = axios.create({
@@ -9,5 +8,13 @@ const apiInstance = axios.create({
     Accept: 'application/json',
   },
 });
+
+apiInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API error:', error);
+    return Promise.reject(error);
+  }
+);
 
 export default apiInstance;
