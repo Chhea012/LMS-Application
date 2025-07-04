@@ -14,7 +14,10 @@ class PermissionTypeController extends Controller
     public function index()
     {
         $types = PermissionType::all();
-        return response()->json($types);
+        return response()->json([
+            'message' => 'Fetched successfully',
+            'data' => $types
+        ]);
     }
 
     /**
