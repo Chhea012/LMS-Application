@@ -1,0 +1,15 @@
+<template>
+  <div class="p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Request Management</h1>
+    <p class="text-gray-600">View and manage user requests here.</p>
+
+    <!-- Placeholder content -->
+    <div class="mt-6 bg-white border border-gray-200 rounded-lg shadow p-4">
+      <p class="text-gray-400 text-center">No requests available.</p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+// Add request logic here if needed
+</script>
