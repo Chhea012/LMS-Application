@@ -2,18 +2,18 @@ import api from '../plugin/axios' // ✅ Adjusted import path is fine (depends o
 
 export default {
   getAll() {
-    return api.get('/v1/department') // ✅ GET all departments
+    return api.get('/department') // ✅ GET all departments
   },
   get(id) {
-    return api.get(`/v1/department/${id}`) // ✅ GET single department
+    return api.get(`/department/${id}`) // ✅ GET single department
   },
   create(data) {
-    return api.post('/v1/department', data) // ✅ POST (create)
+    return api.post('/department', data) // ✅ POST (create)
   },
   update(id, data) {
-    return api.put(`/v1/department/${id}`, data) // ✅ PUT (update)
+    return api.put(`/department/${id}`, data) // ✅ PUT (update)
   },
   delete(id) {
-    return api.delete(`/v1/department/${id}`) // ✅ DELETE
+    return api.delete(`/department/${id}`) // ✅ DELETE
   }
 }

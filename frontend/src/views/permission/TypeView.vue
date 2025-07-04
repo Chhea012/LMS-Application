@@ -197,7 +197,7 @@ document.addEventListener('click', () => {
 const fetchPermissionTypes = async () => {
   try {
     isLoading.value = true
-    const res = await api.get('/v1/permissiontypes')
+    const res = await api.get('/permissiontypes')
     console.log('Fetched data:', res.data.data)
 
     permissionTypes.value = Array.isArray(res.data.data)
@@ -216,7 +216,7 @@ const fetchPermissionTypes = async () => {
 const addPermissionType = async () => {
   try {
     isLoading.value = true
-    const res = await api.post('/v1/permissiontypes', newPermissionType.value)
+    const res = await api.post('/permissiontypes', newPermissionType.value)
     permissionTypes.value.push(res.data.data ?? res.data.data)
     newPermissionType.value = { name: '', description: '' }
     showAddModal.value = false
@@ -238,7 +238,7 @@ const openEditModal = (type) => {
 const updatePermissionType = async () => {
   try {
     isLoading.value = true
-    const res = await api.put(`/v1/permissiontypes/${editPermissionType.value.id}`, editPermissionType.value)
+    const res = await api.put(`/permissiontypes/${editPermissionType.value.id}`, editPermissionType.value)
     const index = permissionTypes.value.findIndex(t => t.id === editPermissionType.value.id)
     if (index !== -1) permissionTypes.value[index] = res.data.data ?? res.data.data
     showEditModal.value = false
@@ -254,7 +254,7 @@ const updatePermissionType = async () => {
 const confirmDelete = async () => {
   try {
     isLoading.value = true
-    await api.delete(`/v1/permissiontypes/${showDeleteConfirm.value}`)
+    await api.delete(`/permissiontypes/${showDeleteConfirm.value}`)
     permissionTypes.value = permissionTypes.value.filter(t => t.id !== showDeleteConfirm.value)
     showDeleteConfirm.value = null
   } catch (err) {
