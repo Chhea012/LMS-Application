@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AccessControl\AuditLogController;
+use App\Http\Controllers\Api\V1\AccessControl\PermissionAccessController;
 use App\Http\Controllers\Api\V1\Department\DepartmentController;
 use App\Http\Controllers\Api\V1\Notification\NotificationController;
 
@@ -8,6 +10,7 @@ use App\Http\Controllers\Api\V1\Permission\PermissionRequestController;
 use App\Http\Controllers\Api\V1\Permission\PermissionTypeController;
 use App\Http\Controllers\Api\V1\Users\RoleController;
 use App\Http\Controllers\Api\V1\Users\UserController;
+use App\Models\AccessControl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use PhpParser\Node\Expr\FuncCall;
@@ -37,4 +40,6 @@ Route::prefix('v1')->group(function(){
     Route::apiResource('permissionrequests', PermissionRequestController::class);
     Route::apiResource('permissionapprovals', PermissionApprovalController::class);
     Route::apiResource('notification', NotificationController::class);
+    Route::apiResource('auditlogs', AuditLogController::class);
+    Route::apiResource('permission', PermissionAccessController::class);
 });

@@ -18,9 +18,9 @@ class Role extends Model
         return $this->hasMany(User::class);
     }
 
-    public function accessControls()
+    public function permissionAccess()
     {
-        return $this->hasMany(AccessControl::class);
+        return $this->hasMany(PermissionAccess::class);
     }
     // Format created_at
     public function getCreatedAtAttribute($value)
