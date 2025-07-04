@@ -132,7 +132,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import api from '@/plugin/axios.js'
-import { Pencil, Trash2 } from 'lucide-vue-next'
+// import { Pencil, Trash2 } from 'lucide-vue-next'
 
 
 
