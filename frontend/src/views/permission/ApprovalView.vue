@@ -16,15 +16,21 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-for="(approval, index) in approvals" :key="index">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ approval.requested_by }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ approval.approved_by }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+              {{ approval.requested_by }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+              {{ approval.approved_by }}
+            </td>
             <td
               class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 underline cursor-pointer"
               @click="openCommentPopup(approval.comments)"
             >
               Comment
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ approval.created_at }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ approval.created_at }}
+            </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span
                 :class="[
@@ -66,7 +72,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import permissionApprovalApi from '@/Api/permissionApproval' // Adjust path if needed
+import permissionApprovalApi from '@/Api/permissionApproval' // adjust path if needed
 
 const approvals = ref([])
 const showPopup = ref(false)
@@ -86,9 +92,10 @@ async function fetchAllApprovals() {
   try {
     const res = await permissionApprovalApi.getAll()
 
-    const sortedAsc = res.data.sort(
-      (a, b) => new Date(a.created_at) - new Date(b.created_at)
-    )
+    const sortedAsc = res.data
+      .filter((approval) => approval.request) // ✅ only require request exists
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+
     const last10 = sortedAsc.slice(-10).reverse()
 
     approvals.value = last10.map((approval) => ({
@@ -106,3 +113,14 @@ async function fetchAllApprovals() {
 
 onMounted(fetchAllApprovals)
 </script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
