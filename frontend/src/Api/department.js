@@ -1,4 +1,4 @@
-import api from '../plugin/axios' // ✅ Adjusted import path is fine (depends on your project structure)
+import api from '@/plugin/axios' // ✅ Adjusted import path is fine (depends on your project structure)
 
 export default {
   getAll() {
