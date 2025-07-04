@@ -112,10 +112,52 @@
             <td class="p-3 border-b">{{ type.description }}</td>
             <td class="p-3 border-b">{{ type.created_at }}</td>
             <td class="p-3 border-b">{{ type.updated_at }}</td>
-            <td class="p-3 border-b space-x-2">
-              <button @click="openEditModal(type)" class="text-blue-600 hover:underline">Edit</button>
-              <button @click="showDeleteConfirm = type.id" class="text-red-600 hover:underline">Delete</button>
-            </td>
+            <td class="p-3 border-b relative" @click.stop>
+  <!-- Three dots button -->
+  <button
+    @click="toggleActionMenu(type.id)"
+    class="p-1 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+    aria-haspopup="true"
+    :aria-expanded="actionMenuOpenId === type.id ? 'true' : 'false'"
+    aria-label="Open actions menu"
+  >
+    <!-- Vertical three dots icon -->
+    <svg
+      class="w-6 h-6 text-gray-600"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="10" cy="4" r="2" />
+      <circle cx="10" cy="10" r="2" />
+      <circle cx="10" cy="16" r="2" />
+    </svg>
+  </button>
+
+  <!-- Dropdown menu -->
+  <transition name="fade">
+    <div
+      v-if="actionMenuOpenId === type.id"
+      class="absolute right-0 mt-2 w-28 bg-white border border-gray-200 rounded shadow-md z-50"
+    >
+      <button
+        @click="() => { openEditModal(type); closeActionMenu(); }"
+        class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 text-sm"
+        type="button"
+      >
+        Edit
+      </button>
+      <button
+        @click="() => { showDeleteConfirm = type.id; closeActionMenu(); }"
+        class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600 text-sm"
+        type="button"
+      >
+        Delete
+      </button>
+    </div>
+  </transition>
+</td>
+
           </tr>
         </tbody>
       </table>
@@ -137,7 +179,21 @@ const showDeleteConfirm = ref(null)
 const isLoading = ref(false)
 const error = ref(null)
 
-// Load all permission types
+
+const actionMenuOpenId = ref(null)
+
+function toggleActionMenu(id) {
+  actionMenuOpenId.value = actionMenuOpenId.value === id ? null : id
+}
+
+function closeActionMenu() {
+  actionMenuOpenId.value = null
+}
+
+document.addEventListener('click', () => {
+  closeActionMenu()
+})
+
 const fetchPermissionTypes = async () => {
   try {
     isLoading.value = true
