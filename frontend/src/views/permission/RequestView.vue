@@ -143,29 +143,6 @@ const searchQuery = ref('')
 const loading = ref(true)
 const error = ref(null)
 
-//create
-const showCreatePopup = ref(false)
-const newRequest = ref({
-  user_id: '',
-  permission_type_id: '',
-  reason: '',
-  status: 'pending'
-})
-
-const createRequest = async () => {
-  try {
-    const response = await api.post('/permissionrequests', newRequest.value)
-    alert('Created successfully!')
-    // Optional: update local data list here or reload page
-    showCreatePopup.value = false
-    // reset form
-    newRequest.value = { user_id: '', permission_type_id: '', reason: '', status: 'pending' }
-  } catch (error) {
-    console.error('Create failed:', error)
-    alert('Failed to create permission request.')
-  }
-}
-
 
 onMounted(async () => {
   try {
