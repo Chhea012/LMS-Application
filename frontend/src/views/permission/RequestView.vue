@@ -3,27 +3,63 @@
     <h2 class="text-2xl font-semibold mb-4 text-gray-800">Permission Requests</h2>
 
     <!-- Filters -->
-    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+
       <!-- Search by Reason -->
-      <div class="w-full sm:w-1/2">
+      <div class="flex-1">
         <label class="block mb-1 font-medium text-gray-700">Search by Reason:</label>
-        <input v-model="searchQuery" type="text" placeholder="Type to search..."
-          class="w-full border border-gray-300 rounded px-3 py-2 shadow-sm focus:outline-none focus:ring focus:ring-blue-300" />
+
+        <div class="relative w-full">
+          <!-- Search Icon (left) -->
+          <span class="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-4.35-4.35M16.65 16.65A7 7 0 1110 3a7 7 0 016.65 13.65z" />
+            </svg>
+          </span>
+
+          <!-- Input Field -->
+          <input v-model="searchQuery" type="text" placeholder="Search for permission . . ."
+            class="w-full border border-gray-300 rounded-full pl-10 pr-10 py-2 shadow-sm focus:outline-none focus:ring focus:ring-blue-300" />
+
+          <!-- Clear (X) Button -->
+          <button v-if="searchQuery" @click="searchQuery = ''"
+            class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+            aria-label="Clear search">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
 
+      <!-- Create Button -->
+      <div class="sm:mb-0">
+        <label class="block mb-1 opacity-0">Button spacer</label>
+        <button @click="showCreatePopup = true"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2 w-full sm:w-auto">
+          <PlusCircle class="w-5 h-5" />
+          Create New Request
+        </button>
+      </div>
+
       <!-- Filter by Status -->
-      <div>
+      <div class="w-full sm:w-auto">
         <label class="block mb-1 font-medium text-gray-700">Filter by Status:</label>
         <select v-model="selectedStatus"
-          class="w-48 border border-gray-300 rounded px-3 py-2 shadow-sm focus:outline-none focus:ring focus:ring-blue-300">
+          class="w-full sm:w-48 border border-gray-300 rounded px-3 py-2 shadow-sm focus:outline-none focus:ring focus:ring-blue-300">
           <option value="">All</option>
           <option value="approved">Approved</option>
           <option value="pending">Pending</option>
           <option value="rejected">Rejected</option>
         </select>
       </div>
+
     </div>
+
 
     <!-- Table -->
     <div class="overflow-x-auto">
@@ -86,47 +122,11 @@
           </tr>
         </tbody>
       </table>
-      <div class="p-6 relative">
-
-
-
-        <!-- Slide-in Popup -->
-        <transition name="slide">
-          <div v-if="showCreatePopup"
-            class="fixed top-0 right-0 w-full max-w-md h-full bg-white shadow-lg p-6 overflow-auto z-50">
-            <h3 class="text-xl font-semibold mb-4">New Permission Request</h3>
-
-            <form @submit.prevent="createRequest">
-              <label class="block mb-1 font-medium">User ID</label>
-              <input v-model="newRequest.user_id" type="number" required class="w-full mb-3 px-3 py-2 border rounded" />
-
-              <label class="block mb-1 font-medium">Permission Type ID</label>
-              <input v-model="newRequest.permission_type_id" type="number" required
-                class="w-full mb-3 px-3 py-2 border rounded" />
-
-              <label class="block mb-1 font-medium">Reason</label>
-              <textarea v-model="newRequest.reason" class="w-full mb-3 px-3 py-2 border rounded" rows="3"></textarea>
-
-              <label class="block mb-1 font-medium">Status</label>
-              <select v-model="newRequest.status" class="w-full mb-3 px-3 py-2 border rounded" required>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-              </select>
-
-              <div class="flex justify-between">
-                <button type="submit"
-                  class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Create</button>
-                <button type="button" @click="showCreatePopup = false"
-                  class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition">Cancel</button>
-              </div>
-            </form>
-          </div>
-        </transition>
-      </div>
     </div>
   </div>
 
+
+ 
 </template>
 
 <script setup>
@@ -144,6 +144,33 @@ const loading = ref(true)
 const error = ref(null)
 
 
+///
+const showCreatePopup = ref(false)
+
+function createRequest() {
+  // Handle form submission logic here (e.g. POST to API)
+  console.log('Creating:', newRequest.value)
+
+  // Reset form (optional)
+  newRequest.value = {
+    user_id: '',
+    permission_type_id: '',
+    reason: '',
+    status: 'pending',
+  }
+
+  showCreatePopup.value = false
+}
+
+const newRequest = ref({
+  user_id: '',
+  permission_type_id: '',
+  reason: '',
+  status: 'pending',
+})
+
+
+//get from database
 onMounted(async () => {
   try {
     const response = await api.get('/permissionrequests')
