@@ -66,7 +66,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import permissionApprovalApi from '../../Api/permissionapproval' // Adjust path if needed
+import permissionApprovalApi from '@/Api/permissionApproval' // Adjust path if needed
 
 const approvals = ref([])
 const showPopup = ref(false)
