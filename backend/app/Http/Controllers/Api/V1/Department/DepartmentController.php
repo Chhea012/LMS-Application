@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Department;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 use App\Models\Department;
@@ -17,9 +18,11 @@ class DepartmentController extends Controller
         $departments = Department::with('head')->get();
 
         return response()->json([
-            'department' => $departments
-        ], 200);
+            'department' => Department::with('head')->get()
+        ]);
     }
+
+
 
     /**
      * Store a newly created resource in storage.
