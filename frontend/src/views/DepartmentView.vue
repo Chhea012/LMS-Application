@@ -163,8 +163,8 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed } from "vue";
-import departmentApi from "../Api/department";
-import userApi from "../Api/user";
+import departmentApi from "@/Api/department";
+import userApi from "@/Api/user";
 
 const departments = ref([]);
 const users = ref([]);
