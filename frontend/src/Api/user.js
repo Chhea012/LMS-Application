@@ -1,5 +1,5 @@
 // src/Api/user.js
-import api from '../plugin/axios' // Adjust path if needed
+import api from '@/plugin/axios' // Adjust path if needed
 
 export default {
   getAll() {

@@ -13,7 +13,7 @@ class PermissionApprovalController extends Controller
      */
     public function index()
     {
-        $approvals = PermissionApproval::with(['request', 'approver'])->get();
+        $approvals = PermissionApproval::with(['request.user', 'approver'])->get();
         return response()->json($approvals, 200);
     }
 
