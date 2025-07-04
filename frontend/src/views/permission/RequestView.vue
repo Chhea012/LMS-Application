@@ -101,18 +101,15 @@
               <!-- Edit Icon -->
               <button @click="editRequest(permissionRequest)" class="text-blue-500 hover:text-blue-700 transition"
                 aria-label="Edit">
-                <Pencil class="w-5 h-5" />
+                <i class="bx bx-edit w-5 h-5"></i>
               </button>
 
               <!-- Delete Icon -->
               <button @click="deleteRequest(permissionRequest.id)" class="text-red-500 hover:text-red-700 transition"
                 aria-label="Delete">
-                <Trash2 class="w-5 h-5" />
+                <i class="bx bx-trash w-5 h-5"></i>
               </button>
             </td>
-
-
-
           </tr>
 
           <tr v-if="filteredPermissions.length === 0">
@@ -132,10 +129,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import api from '@/plugin/axios.js'
-import { Pencil, Trash2 } from 'lucide-vue-next'
-
-
-
 
 const permissionRequests = ref([])
 const selectedStatus = ref('')
@@ -173,6 +166,12 @@ const newRequest = ref({
 //get from database
 onMounted(async () => {
   try {
+    // Load Boxicons CSS
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = 'https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css'
+    document.head.appendChild(link)
+
     const response = await api.get('/permissionrequests')
     permissionRequests.value = response.data
   } catch (err) {
@@ -195,35 +194,32 @@ const filteredPermissions = computed(() => {
 function formatDate(dateString) {
   return new Date(dateString).toLocaleString()
 }
+
 const editRequest = async (request, newStatus) => {
   try {
-    const updatedData = { ...request, status: newStatus };
-    const response = await api.put(`/permissionrequests/${request.id}`, updatedData);
-    // Update local data with fresh response
-    const index = permissionRequests.value.findIndex(req => req.id === request.id);
+    const updatedData = { ...request, status: newStatus }
+    const response = await api.put(`/permissionrequests/${request.id}`, updatedData)
+    const index = permissionRequests.value.findIndex(req => req.id === request.id)
     if (index !== -1) {
-      permissionRequests.value[index] = response.data.data; // Assuming API returns updated object in `data`
+      permissionRequests.value[index] = response.data.data
     }
-    alert('Updated successfully!');
+    alert('Updated successfully!')
   } catch (error) {
-    console.error('Update failed:', error);
-    alert('Failed to update request.');
+    console.error('Update failed:', error)
+    alert('Failed to update request.')
   }
 }
-
 
 const deleteRequest = async (id) => {
-  if (!confirm('Are you sure you want to delete this request?')) return;
+  if (!confirm('Are you sure you want to delete this request?')) return
 
   try {
-    await api.delete(`/permissionrequests/${id}`);
-    // Remove from local list to update UI instantly
-    permissionRequests.value = permissionRequests.value.filter(req => req.id !== id);
-    alert('Deleted successfully!');
+    await api.delete(`/permissionrequests/${id}`)
+    permissionRequests.value = permissionRequests.value.filter(req => req.id !== id)
+    alert('Deleted successfully!')
   } catch (error) {
-    console.error('Delete failed:', error);
-    alert('Failed to delete request.');
+    console.error('Delete failed:', error)
+    alert('Failed to delete request.')
   }
 }
-
 </script>

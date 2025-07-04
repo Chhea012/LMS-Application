@@ -1,104 +1,164 @@
 <template>
-  <div class="h-screen overflow-y-auto bg-gray-50 scrollbar-hide">
-    <div class="p-6">
-      <!-- Header -->
-      <header class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Welcome to the LMS Dashboard</h1>
-        <p class="text-gray-600 mt-1">Manage your Permission Management System efficiently.</p>
-      </header>
-
-      <!-- Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <!-- Departments Card -->
-        <div class="p-6 bg-white rounded-lg shadow border border-gray-200 hover:shadow-lg transition-shadow">
-          <h2 class="text-xl font-semibold text-gray-700">Departments</h2>
-          <p class="text-gray-500 mt-2">Manage all departments in your system.</p>
-          <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Go to Departments</button>
+  <div class="container mx-auto p-4">
+    <div class="grid grid-cols-4 gap-4 mb-4">
+      <div class="bg-white shadow-lg rounded-lg p-4 flex items-center justify-between w-full">
+        <div class="flex items-center">
+          <div class="bg-blue-500 text-white w-12 h-12 flex items-center justify-center rounded mr-4">
+            <font-awesome-icon icon="fa-users" class="text-xl" />
+          </div>
+          <div>
+            <h3 class="text-lg text-gray-600">Total Employees</h3>
+          </div>
         </div>
-
-        <!-- Permissions Card -->
-        <div class="p-6 bg-white rounded-lg shadow border border-gray-200 hover:shadow-lg transition-shadow">
-          <h2 class="text-xl font-semibold text-gray-700">Permissions</h2>
-          <p class="text-gray-500 mt-2">Track and handle permission requests.</p>
-          <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">View Permissions</button>
-        </div>
-
-        <!-- Users Card -->
-        <div class="p-6 bg-white rounded-lg shadow border border-gray-200 hover:shadow-lg transition-shadow">
-          <h2 class="text-xl font-semibold text-gray-700">Users</h2>
-          <p class="text-gray-500 mt-2">View and manage user accounts. Admin can see all.</p>
-          <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Manage Users</button>
+        <div class="text-right">
+          <p class="text-2xl font-bold text-gray-800">1,294</p>
         </div>
       </div>
-
-      <!-- Statistics -->
-      <section class="mb-10">
-        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Statistics</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div class="bg-white rounded-lg shadow border border-gray-200 p-6 text-center">
-            <p class="text-4xl font-bold text-blue-600">12</p>
-            <p class="text-gray-600 mt-1">Active Departments</p>
+      <div class="bg-white shadow-lg rounded-lg p-4 flex items-center justify-between w-full">
+        <div class="flex items-center">
+          <div class="bg-blue-500 text-white w-12 h-12 flex items-center justify-center rounded mr-4">
+            <font-awesome-icon icon="fa-user" class="text-xl" />
           </div>
-          <div class="bg-white rounded-lg shadow border border-gray-200 p-6 text-center">
-            <p class="text-4xl font-bold text-green-600">34</p>
-            <p class="text-gray-600 mt-1">Pending Permissions</p>
-          </div>
-          <div class="bg-white rounded-lg shadow border border-gray-200 p-6 text-center">
-            <p class="text-4xl font-bold text-purple-600">102</p>
-            <p class="text-gray-600 mt-1">Registered Users</p>
+          <div>
+            <h3 class="text-lg text-gray-600">Total Users</h3>
           </div>
         </div>
-      </section>
-
-      <!-- Recent Activity and Quick Actions -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-        <!-- Recent Activity -->
-        <section class="lg:col-span-2 bg-white rounded-lg shadow border border-gray-200 p-6">
-          <h3 class="text-2xl font-semibold text-gray-800 mb-4">Recent Activity</h3>
-          <ul class="divide-y divide-gray-200 max-h-72 overflow-y-auto scrollbar-hide">
-            <li class="py-3">
-              <p class="text-gray-700"><span class="font-semibold">User John Doe</span> requested permission.</p>
-              <p class="text-xs text-gray-500">2 hours ago</p>
-            </li>
-            <li class="py-3">
-              <p class="text-gray-700"><span class="font-semibold">Department Finance</span> was updated.</p>
-              <p class="text-xs text-gray-500">5 hours ago</p>
-            </li>
-            <li class="py-3">
-              <p class="text-gray-700"><span class="font-semibold">New user Jane Smith</span> was added.</p>
-              <p class="text-xs text-gray-500">1 day ago</p>
-            </li>
-          </ul>
-        </section>
-
-        <!-- Quick Actions -->
-        <section class="bg-white rounded-lg shadow border border-gray-200 p-6 flex flex-col justify-center gap-4">
-          <h3 class="text-2xl font-semibold text-gray-800">Quick Actions</h3>
-          <button class="w-full px-4 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-            Create New Department
-          </button>
-          <button class="w-full px-4 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition">
-            Approve Permissions
-          </button>
-          <button class="w-full px-4 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition">
-            Add New User
-          </button>
-        </section>
+        <div class="text-right">
+          <p class="text-2xl font-bold text-gray-800">1,303</p>
+        </div>
+      </div>
+      <div class="bg-white shadow-lg rounded-lg p-4 flex items-center justify-between w-full">
+        <div class="flex items-center">
+          <div class="bg-green-500 text-white w-12 h-12 flex items-center justify-center rounded mr-4">
+            <font-awesome-icon icon="fa-building" class="text-xl" />
+          </div>
+          <div>
+            <h3 class="text-lg text-gray-600">Total Departments</h3>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-2xl font-bold text-gray-800">1,345</p>
+        </div>
+      </div>
+      <div class="bg-white shadow-lg rounded-lg p-4 flex items-center justify-between w-full">
+        <div class="flex items-center">
+          <div class="bg-purple-500 text-white w-12 h-12 flex items-center justify-center rounded mr-4">
+            <font-awesome-icon icon="fa-check-circle" class="text-xl" />
+          </div>
+          <div>
+            <h3 class="text-lg text-gray-600">Total Permission</h3>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-2xl font-bold text-gray-800">576</p>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-white p-4 rounded-lg shadow">
+        <h3 class="text-lg mb-2">User Statistics</h3>
+        <div style="position: relative; height: 300px;">
+          <Line :data="userStatsData" :options="chartOptions" />
+        </div>
+      </div>
+      <div class="bg-white shadow-lg rounded-lg p-4 w-full">
+        <h3 class="text-lg text-gray-600 mb-2">Daily Permission Requests</h3>
+        <div style="position: relative; height: 300px;">
+          <Pie :data="permissionData" :options="permissionOptions" />
+        </div>
+        <p class="text-sm text-gray-500 mt-2">July 03 - July 04, 2025</p>
+      </div>
+    </div>
+    <div class="mt-4 bg-white shadow-lg rounded-lg p-4 flex items-center justify-between w-full">
+      <div class="flex items-center">
+        <div class="bg-blue-500 text-white w-12 h-12 flex items-center justify-center rounded mr-4">
+          <font-awesome-icon icon="fa-users" class="text-xl" />
+        </div>
+        <div>
+          <h3 class="text-lg text-gray-600">Users Online</h3>
+        </div>
+      </div>
+      <div class="text-right">
+        <p class="text-2xl font-bold text-gray-800">17</p>
+        <p class="text-sm text-gray-500">+5%</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-// No extra logic needed for scroll hiding
+import { ref } from 'vue';
+import { Line } from 'vue-chartjs';
+import { Pie } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale, ArcElement } from 'chart.js';
+
+ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale, ArcElement);
+
+const userStatsData = ref({
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  datasets: [
+    {
+      label: 'Subscribers',
+      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750],
+      fill: true,
+    },
+    {
+      label: 'New Visitors',
+      backgroundColor: 'rgba(255, 206, 86, 0.2)',
+      borderColor: 'rgb(255, 206, 86)',
+      data: [150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700],
+      fill: true,
+    },
+    {
+      label: 'Active Users',
+      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      borderColor: 'rgb(54, 162, 235)',
+      data: [300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850],
+      fill: true,
+    },
+  ],
+});
+
+const chartOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+});
+
+const permissionData = ref({
+  labels: ['Pending', 'Approved', 'Rejected', 'Applied'],
+  datasets: [
+    {
+      data: [10, 20, 10, 5],
+      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+      hoverOffset: 4,
+    },
+  ],
+});
+
+const permissionOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false, // Hide the legend
+    },
+    title: {
+      display: true,
+      text: 'Permission Status',
+    },
+    tooltip: {
+      enabled: true, // Enable tooltips
+      callbacks: {
+        label: function(context) {
+          let label = context.label || '';
+          let value = context.raw || 0;
+          return `${label}: ${value}`;
+        },
+      },
+    },
+  },
+});
 </script>
 
-<style scoped>
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
-}
-</style>

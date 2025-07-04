@@ -64,7 +64,7 @@ const profileOpen = ref(false)
 const openSubmenus = ref(['Permission'])
 
 const navigationItems = [
-  { title: 'Home', url: '/', icon: HomeIcon },
+  { title: 'Dashboard', url: '/', icon: HomeIcon },
   { title: 'Department', url: '/department', icon: BuildingIcon },
   {
     title: 'Permission',
