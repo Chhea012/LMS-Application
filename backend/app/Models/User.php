@@ -63,4 +63,12 @@ class User extends Model
     {
         return Carbon::parse($value)->format('F d, Y');
     }
+
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
+        return null;
+    }
 }

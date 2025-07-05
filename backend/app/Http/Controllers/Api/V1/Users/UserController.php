@@ -20,6 +20,7 @@ class UserController extends Controller
             return $user;
         });
 
+
         return response()->json([
             'status' => 'successfully!',
             'users' => $users
