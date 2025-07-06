@@ -5,7 +5,6 @@
         Sign in to your account
       </h1>
 
-      <!-- Error Message -->
       <div
         v-if="error"
         class="bg-red-100 text-red-700 border border-red-300 rounded-md px-4 py-2 mb-6 text-sm"
@@ -44,7 +43,6 @@
             class="absolute right-3 top-9 text-gray-500 hover:text-blue-600"
             :aria-label="showPassword ? 'Hide password' : 'Show password'"
           >
-            <!-- Eye / Eye Off Icons -->
             <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
