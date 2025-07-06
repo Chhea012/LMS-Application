@@ -1,9 +1,10 @@
 <script setup>
 import { defineComponent, h, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-
+import LoginView from './views/LoginView.vue'
 import Sidebar from './components/layout/Sidebar.vue'
 import Navbar from './components/layout/Navbar.vue'
+
 
 // Icon components
 const HomeIcon = defineComponent({
@@ -105,30 +106,36 @@ watch(
 </script>
 
 <template>
-  <div class="flex min-h-screen w-full bg-gray-50">
-    <!-- Sidebar: fixed, always visible on lg and up -->
-    <Sidebar
-      :navigation-items="navigationItems"
-      :sidebar-open="sidebarOpen"
-      :open-submenus="openSubmenus"
-      @toggle-submenu="toggleSubmenu"
-      @toggle-sidebar="toggleSidebar"
-    >
-      <template #logo>
-        <ShieldIcon />
-      </template>
-    </Sidebar>
+  <div>
+    <!-- Show only LoginView if on /login -->
+    <LoginView v-if="route.path === '/login'" />
 
-    <!-- Main content: add lg:ml-64 to push right, no overlap -->
-    <div class="flex-1 flex flex-col lg:ml-64">
-      <Navbar
-        :profile-open="profileOpen"
-        @toggle-profile="toggleProfile"
+    <!-- Otherwise, show full layout -->
+    <div v-else class="flex min-h-screen w-full bg-gray-50">
+      <Sidebar
+        :navigation-items="navigationItems"
+        :sidebar-open="sidebarOpen"
+        :open-submenus="openSubmenus"
+        @toggle-submenu="toggleSubmenu"
         @toggle-sidebar="toggleSidebar"
-      />
-      <main class="mt-6 px-4 sm:px-6 lg:px-8">
-        <router-view />
-      </main>
+      >
+        <template #logo>
+          <ShieldIcon />
+        </template>
+      </Sidebar>
+
+      <div class="flex-1 flex flex-col lg:ml-64">
+        <Navbar
+          :profile-open="profileOpen"
+          @toggle-profile="toggleProfile"
+          @toggle-sidebar="toggleSidebar"
+        />
+        <main class="mt-6 px-4 sm:px-6 lg:px-8">
+          <router-view />
+        </main>
+      </div>
     </div>
   </div>
 </template>
+
+
