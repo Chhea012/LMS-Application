@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Model
 {
-    use HasFactory;
-    // app/Models/User.php
+    use HasFactory, HasApiTokens; // Added HasApiTokens
 
     protected $fillable = [
         'full_name',
@@ -19,9 +19,6 @@ class User extends Model
         'department_id',
         'image',
     ];
-
-
-
 
     public function role()
     {
@@ -52,6 +49,7 @@ class User extends Model
     {
         return $this->hasMany(AuditLog::class);
     }
+
     // Format created_at
     public function getCreatedAtAttribute($value)
     {
