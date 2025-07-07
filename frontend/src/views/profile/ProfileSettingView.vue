@@ -1,32 +1,24 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import {
-  User,
-  Mail,
-  Calendar,
-  Users,
-  Briefcase,
-  Building,
-} from "lucide-vue-next";
+import { Mail, Briefcase, Building, User } from "lucide-vue-next";
 
 const router = useRouter();
 
 const showImageModal = ref(false);
 const showEditModal = ref(false);
 
+import imgage from '../../images/phean2.jpg';
 const profile = ref({
   fullName: "Sophean Phouk",
   email: "sophean123@gmail.com",
-  gender: "Male",
-  dob: "2003-01-01",
-  jobTitle: "Web Developer",
+  jobTitle: "Developer",
   department: "Developer Team",
-  imageUrl: "../../images/phean2.jpg",
+  imageUrl: imgage,
 });
 
 function cancel() {
-  router.push('/');
+  router.push("/");
 }
 
 function openImageModal() {
@@ -47,7 +39,7 @@ function closeEditModal() {
 
 function saveProfile() {
   // Add your save logic here (API call etc.)
-  alert('Profile updated!');
+  alert("Profile updated!");
   showEditModal.value = false;
 }
 
@@ -55,7 +47,7 @@ function onImageChange(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = (e) => {
     profile.value.imageUrl = e.target.result;
   };
   reader.readAsDataURL(file);
@@ -77,10 +69,10 @@ function onImageChange(event) {
         <!-- Profile Header -->
         <div class="px-8 py-6">
           <div class="flex items-start space-x-6">
-            <div class="relative">
+            <div class="relative cursor-pointer" @click="openImageModal">
               <img
-                src="../../images/phean2.jpg"
-                class="w-32 h-32 rounded-lg object-cover border-2 border-gray-200 cursor-pointer"
+                :src="profile.imageUrl"
+                class="w-32 h-32 rounded-lg object-cover border-2 border-gray-200"
                 alt="Profile Picture"
               />
               <div
@@ -123,11 +115,13 @@ function onImageChange(event) {
 
         <div class="px-8 py-6">
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Full Name -->
-            <div class="lg:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <User class="w-4 h-4 inline mr-1" />
-                Full Name
+            <!-- Name -->
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1"
+              >
+                <User class="w-4 h-4" />
+                Name
               </label>
               <input
                 type="text"
@@ -137,10 +131,12 @@ function onImageChange(event) {
               />
             </div>
 
-            <!-- Email Address -->
+            <!-- Email -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <Mail class="w-4 h-4 inline mr-1" />
+              <label
+                class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1"
+              >
+                <Mail class="w-4 h-4" />
                 Email Address
               </label>
               <input
@@ -151,52 +147,12 @@ function onImageChange(event) {
               />
             </div>
 
-            <!-- Gender -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <Users class="w-4 h-4 inline mr-1" />
-                Gender
-              </label>
-              <input
-                type="text"
-                class="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-50 text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                :value="profile.gender"
-                disabled
-              />
-            </div>
-
-            <!-- Date of Birth -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <Calendar class="w-4 h-4 inline mr-1" />
-                Date of Birth
-              </label>
-              <input
-                type="date"
-                class="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-50 text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                :value="profile.dob"
-                disabled
-              />
-            </div>
-
-            <!-- Job Title -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <Briefcase class="w-4 h-4 inline mr-1" />
-                Job Title
-              </label>
-              <input
-                type="text"
-                class="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-50 text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                :value="profile.jobTitle"
-                disabled
-              />
-            </div>
-
             <!-- Department -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <Building class="w-4 h-4 inline mr-1" />
+              <label
+                class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1"
+              >
+                <Building class="w-4 h-4" />
                 Department
               </label>
               <input
@@ -206,45 +162,59 @@ function onImageChange(event) {
                 disabled
               />
             </div>
+
+            <!-- Role -->
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1"
+              >
+                <Briefcase class="w-4 h-4" />
+                Role
+              </label>
+              <input
+                type="text"
+                class="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-50 text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                :value="profile.jobTitle"
+                disabled
+              />
+            </div>
           </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="px-8 py-6 bg-gray-50 border-t border-gray-200 rounded-b-lg">
-          <div class="flex justify-end space-x-4">
-            <button
-              @click="cancel"
-              class="px-6 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              @click="openEditModal"
-              class="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-            >
-              Edit Profile
-            </button>
-          </div>
+        <div
+          class="px-8 py-6 bg-gray-50 border-t border-gray-200 rounded-b-lg flex justify-end space-x-4"
+        >
+          <button
+            @click="cancel"
+            class="px-6 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            @click="openEditModal"
+            class="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            Edit Profile
+          </button>
         </div>
       </div>
 
-      <!-- Additional Information -->
-      <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div class="flex items-start">
-          <div
-            class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"
-          >
-            <User class="w-4 h-4 text-blue-600" />
-          </div>
-          <div class="ml-3">
-            <h4 class="text-sm font-medium text-blue-800">
-              Profile Information
-            </h4>
-            <p class="text-sm text-blue-700 mt-1">
-              Your profile information is currently view-only. Click "Edit
-              Profile" to make changes to your personal details.
-            </p>
-          </div>
+      <!-- Info Notice -->
+      <div
+        class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3"
+      >
+        <div
+          class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"
+        >
+          <User class="w-4 h-4 text-blue-600" />
+        </div>
+        <div>
+          <h4 class="text-sm font-medium text-blue-800">Profile Information</h4>
+          <p class="text-sm text-blue-700 mt-1">
+            Your profile information is currently view-only. Click "Edit
+            Profile" to make changes to your personal details.
+          </p>
         </div>
       </div>
     </div>
@@ -255,7 +225,9 @@ function onImageChange(event) {
       class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
       @click.self="closeImageModal"
     >
-      <div class="bg-white rounded-lg overflow-hidden max-w-xl max-h-[90vh] p-4">
+      <div
+        class="bg-white rounded-lg overflow-hidden max-w-xl max-h-[90vh] p-4"
+      >
         <button
           @click="closeImageModal"
           class="mb-2 text-gray-600 hover:text-gray-900 font-bold"
@@ -291,7 +263,7 @@ function onImageChange(event) {
 
         <!-- Image Preview & Change -->
         <img
-          src="../../images/phean2.jpg"
+          :src="profile.imageUrl"
           alt="Profile Image Preview"
           class="w-32 h-32 rounded-lg object-cover border-2 border-gray-300 mb-4"
         />
@@ -299,31 +271,44 @@ function onImageChange(event) {
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            <input type="text" class="w-full px-4 py-2 border rounded-md" v-model="profile.fullName" />
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Full Name</label
+            >
+            <input
+              type="text"
+              class="w-full px-4 py-2 border rounded-md"
+              v-model="profile.fullName"
+            />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input type="email" class="w-full px-4 py-2 border rounded-md" v-model="profile.email" />
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Email</label
+            >
+            <input
+              type="email"
+              class="w-full px-4 py-2 border rounded-md"
+              v-model="profile.email"
+            />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-            <select class="w-full px-4 py-2 border rounded-md" v-model="profile.gender">
-              <option>Male</option>
-              <option>Female</option>
-            </select>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Role</label
+            >
+            <input
+              type="text"
+              class="w-full px-4 py-2 border rounded-md"
+              v-model="profile.jobTitle"
+            />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-            <input type="date" class="w-full px-4 py-2 border rounded-md" v-model="profile.dob" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
-            <input type="text" class="w-full px-4 py-2 border rounded-md" v-model="profile.jobTitle" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
-            <input type="text" class="w-full px-4 py-2 border rounded-md" v-model="profile.department" />
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Department</label
+            >
+            <input
+              type="text"
+              class="w-full px-4 py-2 border rounded-md"
+              v-model="profile.department"
+            />
           </div>
         </div>
 

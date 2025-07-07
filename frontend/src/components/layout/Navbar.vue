@@ -21,6 +21,9 @@ function handleClickOutside(e) {
   }
 }
 
+// Close dropdown when clicking Profile Settings link
+const closeDropdown = () => emit("close-profile");
+
 onMounted(() => {
   window.addEventListener("click", handleClickOutside);
 });
@@ -136,7 +139,6 @@ onUnmounted(() => {
               </div>
             </div>
             <div class="py-2">
-              <!-- ✅ No closeDropdown here -->
               <RouterLink
                 to="/profile-settings"
                 @click="closeDropdown"

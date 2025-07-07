@@ -86,6 +86,10 @@ const toggleProfile = () => {
   profileOpen.value = !profileOpen.value
 }
 
+const closeProfile = () => {
+  profileOpen.value = false
+}
+
 const toggleSubmenu = (title) => {
   const index = openSubmenus.value.indexOf(title)
   if (index > -1) {
@@ -125,6 +129,7 @@ watch(
         :profile-open="profileOpen"
         @toggle-profile="toggleProfile"
         @toggle-sidebar="toggleSidebar"
+        @close-profile="closeProfile"
       />
       <main class="mt-6 px-4 sm:px-6 lg:px-8">
         <router-view />
