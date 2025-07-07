@@ -4,18 +4,14 @@ use App\Http\Controllers\Api\V1\AccessControl\AuditLogController;
 use App\Http\Controllers\Api\V1\AccessControl\PermissionAccessController;
 use App\Http\Controllers\Api\V1\Department\DepartmentController;
 use App\Http\Controllers\Api\V1\Notification\NotificationController;
-
 use App\Http\Controllers\Api\V1\Permission\PermissionApprovalController;
 use App\Http\Controllers\Api\V1\Permission\PermissionRequestController;
 use App\Http\Controllers\Api\V1\Permission\PermissionTypeController;
 use App\Http\Controllers\Api\V1\Users\RoleController;
 use App\Http\Controllers\Api\V1\Users\UserController;
-use App\Http\Controllers\AuthController;
-use App\Models\AccessControl;
+use App\Http\Controllers\Api\V1\Auth\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use PhpParser\Node\Expr\FuncCall;
-
 
 /*
 |--------------------------------------------------------------------------
