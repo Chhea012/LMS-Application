@@ -1,40 +1,77 @@
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, onMounted, onUnmounted } from "vue";
+import { RouterLink } from "vue-router";
 
 const props = defineProps({
-  profileOpen: Boolean
-})
+  profileOpen: Boolean,
+});
 
-const emit = defineEmits(['toggle-profile', 'toggle-sidebar'])
+const emit = defineEmits(["toggle-profile", "close-profile", "toggle-sidebar"]);
 
-const toggleProfile = () => emit('toggle-profile')
-const toggleSidebar = () => emit('toggle-sidebar')
+const toggleProfile = () => emit("toggle-profile");
+const toggleSidebar = () => emit("toggle-sidebar");
+
+// Close dropdown when clicking outside
+function handleClickOutside(e) {
+  if (
+    !e.target.closest(".profile-dropdown") &&
+    !e.target.closest(".profile-toggle-btn")
+  ) {
+    emit("close-profile");
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("click", handleClickOutside);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("click", handleClickOutside);
+});
 </script>
 
 <template>
   <header
     class="h-16 sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm flex items-center justify-between px-4 sm:px-6"
   >
-    <!-- Left: Sidebar Toggle (Mobile) -->
+    <!-- Left: Sidebar Toggle -->
     <div class="flex items-center gap-3">
       <button
         @click="toggleSidebar"
         class="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
-      <span class="text-xl font-semibold text-teal-700 hidden sm:block">LMS Dashboard</span>
+      <span class="text-xl font-semibold text-teal-700 hidden sm:block"
+        >LMS Dashboard</span
+      >
     </div>
 
-    <!-- Right: Actions -->
+    <!-- Right: Profile Dropdown -->
     <div class="flex items-center gap-4">
-      <!-- Notification -->
+      <!-- Notification (optional) -->
       <button
         class="relative p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -51,7 +88,7 @@ const toggleSidebar = () => emit('toggle-sidebar')
       <div class="relative">
         <button
           @click="toggleProfile"
-          class="flex items-center gap-2 sm:gap-3 p-2 rounded-md hover:bg-gray-100 transition"
+          class="profile-toggle-btn flex items-center gap-2 sm:gap-3 p-2 rounded-md hover:bg-gray-100 transition"
         >
           <img
             src="https://i.pinimg.com/736x/8f/86/50/8f8650ffcdfda6f1767a99565d3a4402.jpg"
@@ -60,7 +97,7 @@ const toggleSidebar = () => emit('toggle-sidebar')
           />
           <div class="hidden sm:block text-left">
             <p class="text-sm font-medium text-gray-800">Sophean Phouk</p>
-            <p class="text-xs text-gray-500">Product Owner</p>
+            <p class="text-xs text-gray-500">Developer</p>
           </div>
           <svg
             class="h-4 w-4 text-gray-400 transition-transform"
@@ -70,7 +107,11 @@ const toggleSidebar = () => emit('toggle-sidebar')
             stroke-width="2"
             viewBox="0 0 24 24"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </button>
 
@@ -78,10 +119,12 @@ const toggleSidebar = () => emit('toggle-sidebar')
         <transition name="fade">
           <div
             v-if="profileOpen"
-            class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50"
+            class="profile-dropdown absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50"
             @click.stop
           >
-            <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+            <div
+              class="flex items-center gap-3 px-4 py-3 border-b border-gray-100"
+            >
               <img
                 src="https://i.pinimg.com/736x/8f/86/50/8f8650ffcdfda6f1767a99565d3a4402.jpg"
                 class="w-9 h-9 rounded-full ring-2 ring-gray-200"
@@ -89,15 +132,25 @@ const toggleSidebar = () => emit('toggle-sidebar')
               />
               <div>
                 <p class="text-sm font-medium text-gray-900">Sophean Phouk</p>
-                <p class="text-xs text-gray-500">Product Owner</p>
+                <p class="text-xs text-gray-500">Developer</p>
               </div>
             </div>
             <div class="py-2">
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile Settings</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account</a>
+              <!-- ✅ No closeDropdown here -->
+              <RouterLink
+                to="/profile-settings"
+                @click="closeDropdown"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Profile Settings
+              </RouterLink>
             </div>
             <div class="border-t border-gray-100 pt-2">
-              <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sign Out</a>
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                >Sign Out</a
+              >
             </div>
           </div>
         </transition>
