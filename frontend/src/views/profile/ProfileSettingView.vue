@@ -2,13 +2,14 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { Mail, Briefcase, Building, User } from "lucide-vue-next";
+import EditProfileModal from "@/components/content/profile/EditProfileModal.vue";
 
 const router = useRouter();
 
 const showImageModal = ref(false);
 const showEditModal = ref(false);
 
-import imgage from '../../images/phean2.jpg';
+import imgage from "../../images/phean2.jpg";
 const profile = ref({
   fullName: "Sophean Phouk",
   email: "sophean123@gmail.com",
@@ -244,89 +245,11 @@ function onImageChange(event) {
     </div>
 
     <!-- Edit Profile Modal -->
-    <div
-      v-if="showEditModal"
-      class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-      @click.self="closeEditModal"
-    >
-      <div class="bg-white rounded-lg w-full max-w-2xl p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-semibold text-gray-900">Edit Profile</h3>
-          <button
-            @click="closeEditModal"
-            class="text-gray-600 hover:text-gray-900 text-xl font-bold"
-            aria-label="Close"
-          >
-            ✕
-          </button>
-        </div>
-
-        <!-- Image Preview & Change -->
-        <img
-          :src="profile.imageUrl"
-          alt="Profile Image Preview"
-          class="w-32 h-32 rounded-lg object-cover border-2 border-gray-300 mb-4"
-        />
-        <input type="file" @change="onImageChange" class="mb-4" />
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Full Name</label
-            >
-            <input
-              type="text"
-              class="w-full px-4 py-2 border rounded-md"
-              v-model="profile.fullName"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Email</label
-            >
-            <input
-              type="email"
-              class="w-full px-4 py-2 border rounded-md"
-              v-model="profile.email"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Role</label
-            >
-            <input
-              type="text"
-              class="w-full px-4 py-2 border rounded-md"
-              v-model="profile.jobTitle"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Department</label
-            >
-            <input
-              type="text"
-              class="w-full px-4 py-2 border rounded-md"
-              v-model="profile.department"
-            />
-          </div>
-        </div>
-
-        <div class="mt-6 flex justify-end space-x-4">
-          <button
-            @click="closeEditModal"
-            class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-          >
-            Cancel
-          </button>
-          <button
-            @click="saveProfile"
-            class="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
+    <EditProfileModal
+      v-model="showEditModal"
+      :profile="profile"
+      @update:profile="updateProfile"
+      @save="onSave"
+    />
   </div>
 </template>
