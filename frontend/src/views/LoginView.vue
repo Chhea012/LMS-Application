@@ -72,6 +72,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import apiInstance from '@/plugin/axios' // ✅ Make sure path is correct
 
 const email = ref('')
 const password = ref('')
@@ -83,13 +84,22 @@ const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
 
-const login = () => {
-  if (email.value === 'admin@example.com' && password.value === 'password') {
-    localStorage.setItem('isLoggedIn', 'true')
-    error.value = ''
+const login = async () => {
+  error.value = ''
+  try {
+    const response = await apiInstance.post('/login', {
+      email: email.value,
+      password: password.value,
+    })
+
+    localStorage.setItem('token', response.data.token)
+    localStorage.setItem('user', JSON.stringify(response.data.user))
+    localStorage.setItem('isLoggedIn', 'true') // ✅ Needed for route guard
+
+    apiInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
     router.push('/')
-  } else {
-    error.value = 'Invalid email or password. Please try again.'
+  } catch (err) {
+    error.value = err.response?.data?.message || 'Invalid email or password.'
   }
 }
 </script>

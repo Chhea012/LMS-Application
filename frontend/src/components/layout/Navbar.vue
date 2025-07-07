@@ -1,14 +1,26 @@
 <script setup>
-// import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits } from "vue";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
-  profileOpen: Boolean
-})
+  profileOpen: Boolean,
+});
 
-const emit = defineEmits(['toggle-profile', 'toggle-sidebar'])
+const emit = defineEmits(["toggle-profile", "toggle-sidebar"]);
 
-const toggleProfile = () => emit('toggle-profile')
-const toggleSidebar = () => emit('toggle-sidebar')
+const toggleProfile = () => emit("toggle-profile");
+const toggleSidebar = () => emit("toggle-sidebar");
+
+const router = useRouter();
+
+const logout = () => {
+  const confirmed = window.confirm("Are you sure you want to sign out?");
+  if (!confirmed) return;
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("isLoggedIn");
+  router.push("/login");
+};
 </script>
 
 <template>
@@ -21,11 +33,23 @@ const toggleSidebar = () => emit('toggle-sidebar')
         @click="toggleSidebar"
         class="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
-      <span class="text-xl font-semibold text-teal-700 hidden sm:block">LMS Dashboard</span>
+      <span class="text-xl font-semibold text-teal-700 hidden sm:block"
+        >LMS Dashboard</span
+      >
     </div>
 
     <!-- Right: Actions -->
@@ -34,7 +58,13 @@ const toggleSidebar = () => emit('toggle-sidebar')
       <button
         class="relative p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -70,7 +100,11 @@ const toggleSidebar = () => emit('toggle-sidebar')
             stroke-width="2"
             viewBox="0 0 24 24"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </button>
 
@@ -81,7 +115,9 @@ const toggleSidebar = () => emit('toggle-sidebar')
             class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50"
             @click.stop
           >
-            <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+            <div
+              class="flex items-center gap-3 px-4 py-3 border-b border-gray-100"
+            >
               <img
                 src="https://i.pinimg.com/736x/8f/86/50/8f8650ffcdfda6f1767a99565d3a4402.jpg"
                 class="w-9 h-9 rounded-full ring-2 ring-gray-200"
@@ -93,11 +129,24 @@ const toggleSidebar = () => emit('toggle-sidebar')
               </div>
             </div>
             <div class="py-2">
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile Settings</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account</a>
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >Profile Settings</a
+              >
+              <a
+                href="#"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >Account</a
+              >
             </div>
             <div class="border-t border-gray-100 pt-2">
-              <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sign Out</a>
+              <button
+                @click="logout"
+                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+              >
+                Sign Out
+              </button>
             </div>
           </div>
         </transition>
