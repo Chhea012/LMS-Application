@@ -1,7 +1,6 @@
 <script setup>
 import { defineComponent, h, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import LoginView from './views/LoginView.vue'
 import Sidebar from './components/layout/Sidebar.vue'
 import Navbar from './components/layout/Navbar.vue'
 
@@ -129,6 +128,7 @@ watch(
           :profile-open="profileOpen"
           @toggle-profile="toggleProfile"
           @toggle-sidebar="toggleSidebar"
+          @close-profile="profileOpen = false"
         />
         <main class="mt-6 px-4 sm:px-6 lg:px-8">
           <router-view />
@@ -137,5 +137,3 @@ watch(
     </div>
   </div>
 </template>
-
-
