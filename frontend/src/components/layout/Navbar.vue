@@ -1,5 +1,6 @@
 <script setup>
 import { defineProps, defineEmits, onMounted, onUnmounted } from "vue";
+import { RouterLink } from "vue-router";
 import { useRouter } from "vue-router";
 
 const props = defineProps({
@@ -32,6 +33,15 @@ onUnmounted(() => {
   window.removeEventListener("click", handleClickOutside);
 });
 const router = useRouter();
+
+const logout = () => {
+  const confirmed = window.confirm("Are you sure you want to sign out?");
+  if (!confirmed) return;
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("isLoggedIn");
+  router.push("/login");
+};
 </script>
 
 <template>
@@ -150,6 +160,7 @@ const router = useRouter();
             </div>
             <div class="border-t border-gray-100 pt-2">
               <button
+                @click="logout"
                 class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
               >
                 Sign Out
