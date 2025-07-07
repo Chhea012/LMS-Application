@@ -6,7 +6,6 @@ import RequestView from "../views/permission/RequestView.vue";
 import TypeView from "../views/permission/TypeView.vue";
 import ApprovalView from "../views/permission/ApprovalView.vue";
 import ProfileSettingView from "@/views/profile/ProfileSettingView.vue";
-import Login from "@/Authentication/Login.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
