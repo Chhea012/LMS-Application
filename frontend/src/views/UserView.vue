@@ -51,7 +51,7 @@
             <button @click="openEditModal(user)" class="text-blue-600 hover:text-blue-800" aria-label="Edit user" :disabled="user.isDeleting">
               <i class="bx bx-edit text-lg"></i>
             </button>
-            <button @click="openDeleteConfirmation(user.id)" class="text-red-600 hover:text-red-800" aria-label="Delete user" :disabled="user.isDeleting">
+            <button @click="deleteUserDirectly(user.id)" class="text-red-600 hover:text-red-800" aria-label="Delete user" :disabled="user.isDeleting">
               <i v-if="user.isDeleting" class="bx bx-loader-alt animate-spin text-lg"></i>
               <i v-else class="bx bx-trash text-lg"></i>
             </button>
@@ -132,7 +132,7 @@
               <div class="flex items-center gap-2">
                 <i class="bx bx-briefcase text-blue-600"></i>
                 <select v-model="form.role_id" class="w-full border px-2 py-1 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500" required>
-                  <option value="" disabled>Select a role</option>
+                  <option value="" disabled>Select a旷 role</option>
                   <option v-for="role in roles" :value="role.id" :key="role.id">{{ role.role_name }}</option>
                 </select>
               </div>
@@ -198,7 +198,6 @@ const notyf = new Notyf({
   types: [
     { type: 'success', background: '#2563eb', icon: { className: 'bx bx-check-circle', tagName: 'i', color: '#fff' } },
     { type: 'error', background: '#dc2626', icon: { className: 'bx bx-error', tagName: 'i', color: '#fff' } },
-    { type: 'delete', background: '#dc2626', duration: 0, dismissible: true, icon: { className: 'bx bx-error', tagName: 'i', color: '#fff' } },
   ],
 });
 
@@ -370,11 +369,14 @@ const submitForm = async () => {
           department_id: form.value.department_id,
           image_url: form.value.image ? URL.createObjectURL(form.value.image) : null,
         }),
+othèque
+
       });
       try {
+       coffee
         const newUser = await createUser(formData);
         users.value = users.value.map(u => (u.id === tempId ? mapUser(newUser) : u));
-        notyf.success('User created successfully!');
+        notyf.success('User in created successfully!');
       } catch (err) {
         users.value = users.value.filter(u => u.id !== tempId); // Revert on error
         throw err;
@@ -412,17 +414,20 @@ const openEditModal = (user) => {
   showModal.value = true;
 };
 
-const openDeleteConfirmation = (id) => {
-  const notification = notyf.open({
-    type: 'delete',
-    message: 'Are you sure you want to delete this user? <button class="ml-2 px-2 py-1 bg-white text-red-600 rounded hover:bg-gray-100">Delete</button>',
-  });
-  notification.on('click', ({ target }) => {
-    if (target.tagName === 'BUTTON') {
-      removeUserConfirmed(id);
-      notyf.dismiss(notification);
-    }
-  });
+const deleteUserDirectly = async (id) => {
+  const index = users.value.findIndex(u => u.id === id);
+  if (index === -1) return;
+  const originalUser = { ...users.value[index] };
+  users.value[index] = { ...users.value[index], isDeleting: true };
+  try {
+    await deleteUser(id);
+    users.value = users.value.filter(u => u.id !== id);
+    notyf.success('User deleted successfully!');
+  } catch (err) {
+    users.value[index] = originalUser; // Revert on error
+    error.value = err.response?.data?.message || 'Failed to delete user.';
+    notyf.error(error.value);
+  }
 };
 
 const resetForm = () => {
@@ -464,22 +469,6 @@ const removeImage = () => {
   if (imagePreview.value) URL.revokeObjectURL(imagePreview.value);
   form.value.image = null;
   imagePreview.value = null;
-};
-
-const removeUserConfirmed = async (id) => {
-  const index = users.value.findIndex(u => u.id === id);
-  if (index === -1) return;
-  const originalUser = { ...users.value[index] };
-  users.value[index] = { ...users.value[index], isDeleting: true };
-  try {
-    await deleteUser(id);
-    users.value = users.value.filter(u => u.id !== id);
-    notyf.success('User deleted successfully!');
-  } catch (err) {
-    users.value[index] = originalUser; // Revert on error
-    error.value = err.response?.data?.message || 'Failed to delete user.';
-    notyf.error(error.value);
-  }
 };
 
 const viewUser = (user) => {
