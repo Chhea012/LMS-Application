@@ -1,4 +1,4 @@
-import api from '@/plugin/axios'
+import api from '@/plugin/axios';
 
 export default {
   getAll() {

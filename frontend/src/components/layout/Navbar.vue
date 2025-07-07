@@ -1,12 +1,13 @@
 <script setup>
 import { defineProps, defineEmits, onMounted, onUnmounted } from "vue";
 import { RouterLink } from "vue-router";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
   profileOpen: Boolean,
 });
 
-const emit = defineEmits(["toggle-profile", "close-profile", "toggle-sidebar"]);
+const emit = defineEmits(["toggle-profile", "toggle-sidebar"]);
 
 const toggleProfile = () => emit("toggle-profile");
 const toggleSidebar = () => emit("toggle-sidebar");
@@ -31,6 +32,16 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("click", handleClickOutside);
 });
+const router = useRouter();
+
+const logout = () => {
+  const confirmed = window.confirm("Are you sure you want to sign out?");
+  if (!confirmed) return;
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("isLoggedIn");
+  router.push("/login");
+};
 </script>
 
 <template>
@@ -148,11 +159,12 @@ onUnmounted(() => {
               </RouterLink>
             </div>
             <div class="border-t border-gray-100 pt-2">
-              <a
-                href="#"
-                class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                >Sign Out</a
+              <button
+                @click="logout"
+                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
               >
+                Sign Out
+              </button>
             </div>
           </div>
         </transition>

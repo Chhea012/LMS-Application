@@ -11,7 +11,7 @@
           </div>
         </div>
         <div class="text-right">
-          <p class="text-2xl font-bold text-gray-800">1,294</p>
+          <p class="text-2xl font-bold text-gray-800">{{ totalEmployees }}</p>
         </div>
       </div>
       <div class="bg-white shadow-lg rounded-lg p-4 flex items-center justify-between w-full">
@@ -24,7 +24,7 @@
           </div>
         </div>
         <div class="text-right">
-          <p class="text-2xl font-bold text-gray-800">1,303</p>
+          <p class="text-2xl font-bold text-gray-800">{{ totalUsers }}</p>
         </div>
       </div>
       <div class="bg-white shadow-lg rounded-lg p-4 flex items-center justify-between w-full">
@@ -37,7 +37,7 @@
           </div>
         </div>
         <div class="text-right">
-          <p class="text-2xl font-bold text-gray-800">1,345</p>
+          <p class="text-2xl font-bold text-gray-800">{{ totalDepartments }}</p>
         </div>
       </div>
       <div class="bg-white shadow-lg rounded-lg p-4 flex items-center justify-between w-full">
@@ -46,11 +46,11 @@
             <font-awesome-icon icon="fa-check-circle" class="text-xl" />
           </div>
           <div>
-            <h3 class="text-lg text-gray-600">Total Permission</h3>
+            <h3 class="text-lg text-gray-600">Total Managers</h3>
           </div>
         </div>
         <div class="text-right">
-          <p class="text-2xl font-bold text-gray-800">576</p>
+          <p class="text-2xl font-bold text-gray-800">{{ totalManagers }}</p>
         </div>
       </div>
     </div>
@@ -87,13 +87,81 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Line } from 'vue-chartjs';
 import { Pie } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale, ArcElement } from 'chart.js';
+import apiInstance from '@/plugin/axios';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale, ArcElement);
 
+// Reactive variables for API data
+const totalUsers = ref(0);
+const totalEmployees = ref(0);
+const totalManagers = ref(0);
+const totalDepartments = ref(0);
+const permissionData = ref({
+  labels: ['Pending', 'Approved', 'Rejected'],
+  datasets: [
+    {
+      data: [0, 0, 0],
+      backgroundColor: ['#FFCE56', '#36A2EB', '#FF6384'],
+      hoverOffset: 4,
+    },
+  ],
+});
+
+// Fetch data from API
+const fetchDashboardData = async () => {
+  try {
+    // Fetch users
+    const usersResponse = await apiInstance.get('/users');
+    const users = usersResponse.data.users || [];
+    totalUsers.value = users.length;
+    totalEmployees.value = users.filter(user => user.role_id === 4).length; // Employee role_id
+    totalManagers.value = users.filter(user => user.role_id === 3).length; // Manager role_id
+
+    // Fetch departments
+    const departmentsResponse = await apiInstance.get('/department');
+    totalDepartments.value = departmentsResponse.data.department.length;
+
+    // Fetch permission requests
+    const permissionsResponse = await apiInstance.get('/permissionrequests');
+    const permissions = permissionsResponse.data || [];
+
+    // Sum the status counts
+    const statusCounts = {
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+    };
+
+    permissions.forEach(permission => {
+      if (permission.status in statusCounts) {
+        statusCounts[permission.status]++;
+      }
+    });
+
+    // Update permissionData for the Pie chart
+    permissionData.value = {
+      labels: ['Pending', 'Approved', 'Rejected'],
+      datasets: [
+        {
+          data: [statusCounts.pending, statusCounts.approved, statusCounts.rejected],
+          backgroundColor: ['#FFCE56', '#36A2EB', '#FF6384'],
+          hoverOffset: 4,
+        },
+      ],
+    };
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+  }
+};
+
+// Call fetchDashboardData when component is mounted
+onMounted(fetchDashboardData);
+
+// User statistics chart data (unchanged since no API data provided for this)
 const userStatsData = ref({
   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   datasets: [
@@ -126,30 +194,20 @@ const chartOptions = ref({
   maintainAspectRatio: false,
 });
 
-const permissionData = ref({
-  labels: ['Pending', 'Approved', 'Rejected', 'Applied'],
-  datasets: [
-    {
-      data: [10, 20, 10, 5],
-      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-      hoverOffset: 4,
-    },
-  ],
-});
-
 const permissionOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false, // Hide the legend
+      display: true, // Show the legend
+      position: 'bottom',
     },
     title: {
       display: true,
       text: 'Permission Status',
     },
     tooltip: {
-      enabled: true, // Enable tooltips
+      enabled: true,
       callbacks: {
         label: function(context) {
           let label = context.label || '';
@@ -161,4 +219,3 @@ const permissionOptions = ref({
   },
 });
 </script>
-
