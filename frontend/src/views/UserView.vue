@@ -60,6 +60,7 @@
       </tbody>
     </table>
 
+
     <!-- View User Popup -->
     <div v-if="showViewModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
       <div class="bg-white max-w-sm w-full mx-4 rounded-lg shadow-md relative overflow-hidden animate-fade-in">
@@ -124,6 +125,7 @@
               <label class="block text-xs mb-1 font-medium text-gray-700">Password <span v-if="editing" class="text-gray-500 text-xs">(optional)</span></label>
               <div class="flex items-center gap-2">
                 <i class="bx bx-lock-alt text-blue-600"></i>
+
                 <input v-model="form.password" type="password" class="w-full border px-2 py-1 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500" :required="!editing" />
               </div>
             </div>
@@ -188,6 +190,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { Notyf } from 'notyf';
 import 'notyf/notyf.min.css';
 import apiInstance from '@/plugin/axios';
+
 
 // Initialize Notyf
 const notyf = new Notyf({
@@ -321,6 +324,7 @@ const submitForm = async () => {
     return;
   }
 
+
   const formData = new FormData();
   formData.append('full_name', form.value.full_name);
   formData.append('email', form.value.email);
@@ -443,6 +447,7 @@ const handleImageDrop = (e) => {
   validateAndSetImage(file);
   isDragging.value = false;
 };
+
 
 const validateAndSetImage = (file) => {
   if (!file) return;

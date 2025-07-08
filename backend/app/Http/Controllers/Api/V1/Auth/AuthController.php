@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Controller; // Don't forget to import Controller base class
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    // Register new user with role_id and department_id
     public function register(Request $request)
     {
         try {
@@ -40,6 +40,7 @@ class AuthController extends Controller
         }
     }
 
+    // Login user and return token
     public function login(Request $request)
     {
         try {
@@ -67,6 +68,7 @@ class AuthController extends Controller
         }
     }
 
+    // Logout user by revoking token
     public function logout(Request $request)
     {
         try {
