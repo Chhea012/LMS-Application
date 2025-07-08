@@ -12,64 +12,72 @@ class AuthController extends Controller
     // Register new user with role_id and department_id
     public function register(Request $request)
     {
-        $fields = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|confirmed|min:8',
-            'role_id' => 'nullable|integer|exists:roles,id',
-            'department_id' => 'nullable|integer|exists:departments,id',
-        ]);
+        try {
+            $fields = $request->validate([
+                'full_name' => 'required|string', // Changed from 'name'
+                'email' => 'required|string|email|unique:users,email',
+                'password' => 'required|string|confirmed|min:6', // Added min:6
+                'role_id' => 'required|exists:roles,id', // Added to match migration
+            ]);
 
-        $user = User::create([
-            'full_name' => $fields['full_name'],
-            'email' => $fields['email'],
-            'password' => bcrypt($fields['password']),
-            'role_id' => $fields['role_id'] ?? null,
-            'department_id' => $fields['department_id'] ?? null,
-            'is_active' => 1, // default active
-        ]);
+            $user = User::create([
+                'full_name' => $fields['full_name'], // Changed from 'name'
+                'email' => $fields['email'],
+                'password' => bcrypt($fields['password']),
+                'role_id' => $fields['role_id'], // Added
+            ]);
 
-        $token = $user->createToken('apptoken')->plainTextToken;
+            $token = $user->createToken('apptoken')->plainTextToken;
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 201);
+            return response()->json([
+                'user' => $user,
+                'token' => $token,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Registration failed: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     // Login user and return token
     public function login(Request $request)
     {
-        $fields = $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        try {
+            $fields = $request->validate([
+                'email' => 'required|string|email',
+                'password' => 'required|string',
+            ]);
 
-        $user = User::where('email', $fields['email'])->first();
+            $user = User::where('email', $fields['email'])->first();
 
-        if (
-            !$user ||
-            !Hash::check($fields['password'], $user->password) ||
-            $user->is_active != 1
-        ) {
+            if (!$user || !Hash::check($fields['password'], $user->password)) {
+                return response(['message' => 'Invalid credentials'], 401);
+            }
+
+            $token = $user->createToken('apptoken')->plainTextToken;
+
             return response()->json([
-                'message' => 'Invalid email or password. Please try again.',
-            ], 401);
+                'user' => $user,
+                'token' => $token,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Login failed: ' . $e->getMessage(),
+            ], 500);
         }
-
-        $token = $user->createToken('apptoken')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
     }
 
     // Logout user by revoking token
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json(['message' => 'Logged out successfully.']);
+        try {
+            $request->user()->currentAccessToken()->delete();
+            return response()->json(['message' => 'Logged out']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Logout failed: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

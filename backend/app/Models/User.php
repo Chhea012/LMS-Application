@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable; // Correct base class for auth
 use Laravel\Sanctum\HasApiTokens;                      // Needed for Sanctum tokens
 use Illuminate\Support\Carbon;
+// use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory;
+    use HasFactory, HasApiTokens; // Added HasApiTokens
 
     protected $fillable = [
         'full_name',
@@ -21,19 +22,6 @@ class User extends Authenticatable
         'is_active',
     ];
 
-
-    protected $hidden = [
-        'password',        // Hide password in JSON output
-        'remember_token',  // Hide remember token as well
-    ];
-
-    protected $casts = [
-        'email_verified_at' => 'datetime', // If you have this column
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    // Relationships (all look correct)
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -64,7 +52,7 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class);
     }
 
-    // Format created_at date
+    // Format created_at
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->format('F d, Y');

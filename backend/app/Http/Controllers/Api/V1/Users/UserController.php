@@ -20,7 +20,6 @@ class UserController extends Controller
             return $user;
         });
 
-
         return response()->json([
             'status' => 'successfully!',
             'users' => $users
@@ -131,6 +130,7 @@ class UserController extends Controller
             'user' => $user
         ]);
     }
+
 
     /**
      * Remove the specified resource from storage.
