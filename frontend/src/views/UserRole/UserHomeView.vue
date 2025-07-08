@@ -6,17 +6,20 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       <!-- Request Permission -->
       <DashboardCard
-        title="Request Permission"
-        class="bg-white shadow-lg rounded-xl p-6 border-t-4 border-blue-500"
-      >
-        <p class="text-gray-600 mb-4">Submit a new permission request.</p>
-        <button
-          @click="showModal = true"
-          class="bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-blue-700 shadow-sm transition duration-200"
-        >
-          Request Now
-        </button>
-      </DashboardCard>
+  title="Request Permission"
+  class="bg-white shadow-lg rounded-xl p-6 border-t-4 border-blue-500 cursor-pointer hover:scale-[1.01] transition-transform"
+  @click="goToRequestPage"
+>
+  <p class="text-gray-600 mb-4">Submit a new permission request.</p>
+  <button
+    @click.stop="goToRequestPage"
+    class="bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-full hover:bg-blue-700 shadow-sm transition duration-200"
+  >
+    Request Now
+  </button>
+</DashboardCard>
+
+
 
       <!-- Days You Can Request -->
       <DashboardCard
@@ -75,4 +78,9 @@ const router = useRouter()
 function goToRequestDays() {
   router.push({ name: 'RequestDays' })
 }
+
+function goToRequestPage() {
+  router.push({ name: 'RequestPermission' })
+}
+
 </script>
