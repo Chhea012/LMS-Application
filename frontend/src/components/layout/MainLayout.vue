@@ -5,7 +5,6 @@ import LoginView from '@/views/LoginView.vue'
 import Sidebar from '@/components/layout/Sidebar.vue'
 import Navbar from '@/components/layout/Navbar.vue'
 
-
 // Icon components
 const HomeIcon = defineComponent({
   name: 'HomeIcon',

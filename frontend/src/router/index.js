@@ -11,7 +11,6 @@ import UserView from '@/views/UserView.vue'
 import RequestView from '@/views/permission/RequestView.vue'
 import TypeView from '@/views/permission/TypeView.vue'
 import ApprovalView from '@/views/permission/ApprovalView.vue'
-import ProfileSettingView from '@/views/profile/ProfileSettingView.vue'
 
 const routes = [
   {
