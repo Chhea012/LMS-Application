@@ -11,12 +11,18 @@ import UserView from '@/views/UserView.vue'
 import RequestView from '@/views/permission/RequestView.vue'
 import TypeView from '@/views/permission/TypeView.vue'
 import ApprovalView from '@/views/permission/ApprovalView.vue'
+import UserHomeView from '@/views/UserRole/UserHomeView.vue'
 
 const routes = [
   {
     path: '/login',
     name: 'login',
     component: LoginView
+  },
+  {
+    path: '/userhome',
+    name: 'userhome',
+    component: UserHomeView
   },
   {
     path: '/',
