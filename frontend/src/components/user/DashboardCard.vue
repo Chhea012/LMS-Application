@@ -6,5 +6,7 @@
 </template>
 
 <script setup>
-defineProps({ title: String })
+defineProps({
+  title: String,
+})
 </script>

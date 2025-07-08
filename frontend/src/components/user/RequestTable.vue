@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white shadow rounded-xl p-6">
+  <div class="bg-white/80 backdrop-blur-xl shadow-lg rounded-2xl p-6 border border-teal-100">
     <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-      <h2 class="text-lg font-semibold text-gray-800">Request History</h2>
+      <h2 class="text-xl font-semibold mb-5 text-teal-700 border-b pb-2">Request History</h2>
       <select v-model="filterStatus" class="border rounded px-3 py-1 text-sm">
         <option value="">All</option>
         <option value="Approved">Approved</option>
@@ -12,7 +12,7 @@
 
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+        <thead class="bg-teal-50 text-teal-700">
           <tr>
             <th class="text-left px-4 py-2 text-gray-700">Date</th>
             <th class="text-left px-4 py-2 text-gray-700">Reason</th>
@@ -23,10 +23,10 @@
           <tr
             v-for="(request, index) in filteredRequests"
             :key="index"
-            class="hover:bg-gray-50"
+            class="hover:bg-teal-50 text-teal-700"
           >
-            <td class="px-4 py-2">{{ request.date }}</td>
-            <td class="px-4 py-2">{{ request.reason }}</td>
+            <td class="px-4 py-2 text-gray-700 font-medium">{{ request.date }}</td>
+            <td class="px-4 py-2 text-gray-700 font-medium">{{ request.reason }}</td>
             <td class="px-4 py-2">
               <span
                 :class="[
