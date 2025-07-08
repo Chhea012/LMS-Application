@@ -13,6 +13,7 @@ import TypeView from '@/views/permission/TypeView.vue'
 import ApprovalView from '@/views/permission/ApprovalView.vue'
 import UserHomeView from '@/views/UserRole/UserHomeView.vue'
 import ProfileSettingView from '@/views/profile/ProfileSettingView.vue'
+import RequestDayView from '@/views/UserRole/RequestDayView.vue'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/userhome',
     name: 'userhome',
     component: UserHomeView
+  },
+  {
+    path: '/request-days',
+    name: 'RequestDays',
+    component: RequestDayView,
   },
   {
     path: '/',
