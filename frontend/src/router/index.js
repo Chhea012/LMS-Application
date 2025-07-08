@@ -15,6 +15,7 @@ import UserHomeView from '@/views/UserRole/UserHomeView.vue'
 import ProfileSettingView from '@/views/profile/ProfileSettingView.vue'
 import RequestDayView from '@/views/UserRole/RequestDayView.vue'
 import PermissionRequestView from '@/views/UserRole/PermissionRequestView.vue'
+import HistoryDetailView from '@/views/UserRole/HistoryDetailView.vue'
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: '/request-permission',
     name: 'RequestPermission',
     component: PermissionRequestView,
+  },
+  {
+    path: '/history-detail',
+    name: 'HistoryDetail',
+    component: HistoryDetailView,
   },
   {
     path: '/',
