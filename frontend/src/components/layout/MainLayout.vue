@@ -128,6 +128,7 @@ watch(
           :profile-open="profileOpen"
           @toggle-profile="toggleProfile"
           @toggle-sidebar="toggleSidebar"
+          @close-profile="profileOpen = false"
         />
         <main class="mt-6 px-4 sm:px-6 lg:px-8">
           <router-view />

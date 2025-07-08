@@ -11,6 +11,8 @@ import UserView from '@/views/UserView.vue'
 import RequestView from '@/views/permission/RequestView.vue'
 import TypeView from '@/views/permission/TypeView.vue'
 import ApprovalView from '@/views/permission/ApprovalView.vue'
+import UserHomeView from '@/views/UserRole/UserHomeView.vue'
+import ProfileSettingView from '@/views/profile/ProfileSettingView.vue'
 
 const routes = [
   {
@@ -19,9 +21,19 @@ const routes = [
     component: LoginView
   },
   {
+    path: '/userhome',
+    name: 'userhome',
+    component: UserHomeView
+  },
+  {
     path: '/',
     component: MainLayout,
     children: [
+      {
+        path: '/profile-settings',
+        name: 'profile-settings',
+        component: ProfileSettingView
+      },
       { path: '', name: 'home', component: HomeView },
       { path: 'department', name: 'department', component: DepartmentView },
       { path: 'user', name: 'user', component: UserView },
