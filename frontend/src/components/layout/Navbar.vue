@@ -1,78 +1,3 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import api from '@/plugin/axios.js'
-
-const props = defineProps({
-  profileOpen: Boolean
-})
-
-const emit = defineEmits(['toggle-profile', 'toggle-sidebar'])
-
-const notifications = ref([])
-const notificationOpen = ref(false)
-const loading = ref(false)
-const toast = ref({
-  visible: false,
-  message: '',
-  type: 'success',
-})
-// Mocked user (Sophean, admin). Replace with auth context (e.g., store.getters.currentUser).
-const currentUser = ref({ id: 1, full_name: 'Sophean Phouk', role_id: 1, department_id: 1 })
-
-function showToast(message, type = 'success') {
-  toast.value.message = message
-  toast.value.type = type
-  toast.value.visible = true
-  setTimeout(() => {
-    toast.value.visible = false
-  }, 3000)
-}
-
-async function fetchNotifications() {
-  loading.value = true
-  try {
-    const res = await api.get('/notification')
-    const data = res.data.notification
-    if (Array.isArray(data)) {
-      notifications.value = data.map(n => ({
-        ...n,
-        status: n.is_read ? 'read' : 'unread' // Map is_read (0/1) to status (unread/read)
-      }))
-    } else {
-      throw new Error('Invalid notifications data format')
-    }
-  } catch (err) {
-    console.error('Error fetching notifications:', err.message, err.response?.data)
-    showToast('Failed to load notifications.', 'error')
-  } finally {
-    loading.value = false
-  }
-}
-
-function toggleNotification() {
-  notificationOpen.value = !notificationOpen.value
-  if (notificationOpen.value) {
-    fetchNotifications()
-  }
-}
-
-function toggleProfile() {
-  emit('toggle-profile')
-}
-
-function toggleSidebar() {
-  emit('toggle-sidebar')
-}
-
-function formatDate(dateString) {
-  return dateString ? new Date(dateString).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'
-}
-
-onMounted(() => {
-  fetchNotifications()
-})
-</script>
-
 <template>
   <header
     class="h-16 sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm flex items-center justify-between px-4 sm:px-6"
@@ -90,14 +15,14 @@ onMounted(() => {
       <span class="text-xl font-semibold text-teal-700 hidden sm:block">LMS Dashboard</span>
     </div>
 
-    <!-- Right: Notifications and Profile -->
+    <!-- Right: Actions -->
     <div class="flex items-center gap-4">
-      <!-- Notification Icon -->
+      <!-- Notification -->
       <div class="relative">
         <button
-          @click="toggleNotification"
+          @click="toggleNotifications"
           class="relative p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition"
-          :disabled="loading"
+          aria-label="Toggle notifications"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path
@@ -107,39 +32,45 @@ onMounted(() => {
             />
           </svg>
           <span
-            v-if="notifications.filter(n => n.status === 'unread').length > 0"
+            v-if="notifications.length"
             class="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"
           >
-            {{ notifications.filter(n => n.status === 'unread').length }}
+            {{ notifications.length }}
           </span>
         </button>
+
         <!-- Notification Dropdown -->
         <transition name="fade">
           <div
             v-if="notificationOpen"
-            class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50"
-            @click.stop
+            class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50 max-h-96 overflow-y-auto"
           >
-            <div class="px-4 py-3 border-b border-gray-100">
-              <p class="text-sm font-medium text-gray-900">Notifications</p>
+            <div v-if="notifications.length === 0" class="px-4 py-3 text-sm text-gray-500">
+              No new notifications
             </div>
-            <div v-if="loading" class="px-4 py-3 text-sm text-gray-500 text-center">
-              Loading notifications...
-            </div>
-            <div v-else-if="notifications.length === 0" class="px-4 py-3 text-sm text-gray-500 text-center">
-              No notifications available.
-            </div>
-            <div v-else class="max-h-96 overflow-y-auto">
-              <div
-                v-for="notification in notifications"
-                :key="notification.id"
-                class="px-4 py-3 border-b border-gray-100 last:border-b-0"
-              >
-                <p class="text-sm text-gray-800">{{ notification.message }}</p>
-                <p class="text-xs text-gray-500">{{ formatDate(notification.created_at) }}</p>
-                <p class="text-xs" :class="notification.status === 'unread' ? 'text-blue-600' : 'text-gray-600'">
-                  Status: {{ notification.status }}
+            <div v-for="notification in notifications" :key="notification.id" class="border-b border-gray-100 last:border-b-0">
+              <div class="px-4 py-3">
+                <p class="text-sm font-medium text-gray-900">
+                  New request from {{ notification.user?.full_name || 'N/A' }}
                 </p>
+                <p class="text-xs text-gray-500">{{ notification.reason }}</p>
+                <p class="text-xs text-gray-400">{{ formatDate(notification.created_at) }}</p>
+                <div class="mt-2 flex gap-2">
+                  <button
+                    @click="handleRequestAction(notification.id, 'approved')"
+                    class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700"
+                    :disabled="loading"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    @click="handleRequestAction(notification.id, 'rejected')"
+                    class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                    :disabled="loading"
+                  >
+                    Reject
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -151,6 +82,7 @@ onMounted(() => {
         <button
           @click="toggleProfile"
           class="flex items-center gap-2 sm:gap-3 p-2 rounded-md hover:bg-gray-100 transition"
+          aria-label="Toggle profile"
         >
           <img
             src="https://i.pinimg.com/736x/8f/86/50/8f8650ffcdfda6f1767a99565d3a4402.jpg"
@@ -178,7 +110,6 @@ onMounted(() => {
           <div
             v-if="profileOpen"
             class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50"
-            @click.stop
           >
             <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
               <img
@@ -202,18 +133,71 @@ onMounted(() => {
         </transition>
       </div>
     </div>
-
-    <!-- Toast Notification -->
-    <transition name="toast-fade">
-      <div v-if="toast.visible" :class="[
-        'fixed bottom-6 right-6 px-4 py-2 rounded shadow-md text-white font-semibold select-none',
-        toast.type === 'success' ? 'bg-green-600' : 'bg-red-600',
-      ]" role="alert">
-        {{ toast.message }}
-      </div>
-    </transition>
   </header>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import api from '@/plugin/axios.js'
+
+const props = defineProps({
+  profileOpen: Boolean,
+  requestViewRef: Object, // Reference to RequestView.vue component
+})
+
+const emit = defineEmits(['toggle-profile', 'toggle-sidebar', 'notification-updated'])
+
+const notificationOpen = ref(false)
+const notifications = ref([])
+const loading = ref(false)
+
+const toggleProfile = () => emit('toggle-profile')
+const toggleSidebar = () => emit('toggle-sidebar')
+const toggleNotifications = () => {
+  notificationOpen.value = !notificationOpen.value
+}
+
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+async function fetchNotifications() {
+  try {
+    const response = await api.get('/permissionrequests?status=pending')
+    notifications.value = response.data.filter(request => request.status === 'pending')
+  } catch (error) {
+    console.error('Failed to fetch notifications:', error)
+  }
+}
+
+async function handleRequestAction(id, status) {
+  if (!props.requestViewRef) {
+    console.error('requestViewRef is not defined')
+    return
+  }
+  try {
+    loading.value = true
+    await props.requestViewRef.updateRequestStatus(id, status)
+    notifications.value = notifications.value.filter(n => n.id !== id)
+    emit('notification-updated') // Notify parent to refresh RequestView
+    console.log(`Request ${id} ${status} successfully`)
+  } catch (error) {
+    console.error(`Failed to ${status} request:`, error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchNotifications()
+})
+
+defineExpose({
+  addNotification(request) {
+    notifications.value.unshift(request)
+  }
+})
+</script>
 
 <style scoped>
 .fade-enter-active,
@@ -223,14 +207,5 @@ onMounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-.toast-fade-enter-active,
-.toast-fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.toast-fade-enter-from,
-.toast-fade-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
 }
 </style>

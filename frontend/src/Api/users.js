@@ -8,47 +8,30 @@ export const getUsers = async () => {
       api.get('/department'),
     ]);
 
-    console.log('Users response:', usersRes.data);
-    console.log('Roles response:', rolesRes.data);
-    console.log('Departments response:', deptsRes.data);
-
-    // Normalize user data
     const users = Array.isArray(usersRes.data.users)
       ? usersRes.data.users
       : Array.isArray(usersRes.data)
       ? usersRes.data
       : [];
-
-    // Normalize roles data
     const roles = Array.isArray(rolesRes.data.roles)
       ? rolesRes.data.roles
       : Array.isArray(rolesRes.data)
       ? rolesRes.data
       : [];
-
-    // Normalize departments data (fix: use 'department' key)
     const departments = Array.isArray(deptsRes.data.department)
       ? deptsRes.data.department
       : Array.isArray(deptsRes.data)
       ? deptsRes.data
       : [];
 
-    console.log('Parsed users:', users);
-    console.log('Parsed roles:', roles);
-    console.log('Parsed departments:', departments);
-
-    return users.map((user) => {
-      const role = roles.find((r) => r.id === user.role_id);
-      const dept = departments.find((d) => d.id === user.department_id);
-      return {
-        ...user,
-        role_name: role ? role.role_name : 'Unknown',
-        department_name: dept ? dept.name : 'Unknown',
-      };
-    });
+    return users.map((user) => ({
+      ...user,
+      role_name: roles.find((r) => r.id === user.role_id)?.role_name || 'Unknown',
+      department_name: departments.find((d) => d.id === user.department_id)?.name || 'Unknown',
+    }));
   } catch (error) {
-    console.error('Error fetching users:', error.response || error);
-    throw new Error('Failed to fetch users: ' + (error.response?.data?.message || error.message));
+    console.error('Error fetching users:', error);
+    throw new Error(error.response?.data?.message || 'Failed to fetch users');
   }
 };
 
@@ -69,8 +52,8 @@ export const createUser = async (userData) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error creating user:', error.response || error);
-    throw new Error('Failed to create user: ' + (error.response?.data?.message || error.message));
+    console.error('Error creating user:', error);
+    throw new Error(error.response?.data?.message || 'Failed to create user');
   }
 };
 
@@ -86,7 +69,7 @@ export const updateUser = async (id, userData) => {
   if (userData.image) {
     formData.append('image', userData.image);
   }
-  formData.append('_method', 'PUT'); // Explicitly add _method for Laravel
+  formData.append('_method', 'PUT');
 
   try {
     const response = await api.post(`/users/${id}`, formData, {
@@ -94,8 +77,8 @@ export const updateUser = async (id, userData) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error updating user:', error.response || error);
-    throw new Error('Failed to update user: ' + (error.response?.data?.message || error.message));
+    console.error('Error updating user:', error);
+    throw new Error(error.response?.data?.message || 'Failed to update user');
   }
 };
 
@@ -104,29 +87,27 @@ export const deleteUser = async (id) => {
     const response = await api.delete(`/users/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting user:', error.response || error);
-    throw new Error('Failed to delete user: ' + (error.response?.data?.message || error.message));
+    console.error('Error deleting user:', error);
+    throw new Error(error.response?.data?.message || 'Failed to delete user');
   }
 };
 
 export const getRoles = async () => {
   try {
     const res = await api.get('/roles');
-    console.log('Roles fetched:', res.data);
     return Array.isArray(res.data.roles) ? res.data.roles : Array.isArray(res.data) ? res.data : [];
   } catch (error) {
-    console.error('Error fetching roles:', error.response || error);
-    throw new Error('Failed to fetch roles: ' + (error.response?.data?.message || error.message));
+    console.error('Error fetching roles:', error);
+    throw new Error(error.response?.data?.message || 'Failed to fetch roles');
   }
 };
 
 export const getDepartments = async () => {
   try {
     const res = await api.get('/department');
-    console.log('Departments fetched:', res.data);
     return Array.isArray(res.data.department) ? res.data.department : Array.isArray(res.data) ? res.data : [];
   } catch (error) {
-    console.error('Error fetching departments:', error.response || error);
-    throw new Error('Failed to fetch departments: ' + (error.response?.data?.message || error.message));
+    console.error('Error fetching departments:', error);
+    throw new Error(error.response?.data?.message || 'Failed to fetch departments');
   }
 };

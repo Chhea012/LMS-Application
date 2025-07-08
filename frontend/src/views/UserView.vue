@@ -51,7 +51,7 @@
             <button @click="openEditModal(user)" class="text-blue-600 hover:text-blue-800" aria-label="Edit user" :disabled="user.isDeleting">
               <i class="bx bx-edit text-lg"></i>
             </button>
-            <button @click="deleteUserDirectly(user.id)" class="text-red-600 hover:text-red-800" aria-label="Delete user" :disabled="user.isDeleting">
+            <button @click="removeUserConfirmed(user.id)" class="text-red-600 hover:text-red-800" aria-label="Delete user" :disabled="user.isDeleting">
               <i v-if="user.isDeleting" class="bx bx-loader-alt animate-spin text-lg"></i>
               <i v-else class="bx bx-trash text-lg"></i>
             </button>
@@ -132,7 +132,7 @@
               <div class="flex items-center gap-2">
                 <i class="bx bx-briefcase text-blue-600"></i>
                 <select v-model="form.role_id" class="w-full border px-2 py-1 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500" required>
-                  <option value="" disabled>Select a旷 role</option>
+                  <option value="" disabled>Select a role</option>
                   <option v-for="role in roles" :value="role.id" :key="role.id">{{ role.role_name }}</option>
                 </select>
               </div>
@@ -187,7 +187,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { Notyf } from 'notyf';
 import 'notyf/notyf.min.css';
-import apiInstance from '@/plugin/axios';
+import { getUsers, createUser, updateUser, deleteUser, getRoles, getDepartments } from '@/Api/users';
 
 // Initialize Notyf
 const notyf = new Notyf({
@@ -231,61 +231,28 @@ const mapUser = (user) => ({
   ...user,
   role_name: roles.value.find(r => r.id === user.role_id)?.role_name || 'Unknown',
   department_name: departments.value.find(d => d.id === user.department_id)?.name || 'Unknown',
-  isDeleting: false, // Track deletion state for UI feedback
+  isDeleting: false,
 });
 
-// API functions
-const fetchUsers = async () => {
+// Fetch data
+const fetchData = async () => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await apiInstance.get('/users');
-    users.value = response.data.users.map(mapUser);
-  } catch (err) {
-    error.value = err.response?.data?.message || 'Failed to fetch users.';
-    notyf.error(error.value);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const fetchRolesAndDepartments = async () => {
-  try {
-    if (roles.value.length && departments.value.length) return; // Skip if already fetched
-    loading.value = true;
-    error.value = null;
-    const [rolesRes, deptsRes] = await Promise.all([
-      apiInstance.get('/roles').then(res => res.data.roles),
-      apiInstance.get('/department').then(res => res.data.department),
+    const [usersData, rolesData, departmentsData] = await Promise.all([
+      getUsers(),
+      getRoles(),
+      getDepartments(),
     ]);
-    roles.value = rolesRes;
-    departments.value = deptsRes;
-    // Refresh users to update role_name and department_name if fetched after users
-    if (users.value.length) {
-      users.value = users.value.map(mapUser);
-    }
+    roles.value = rolesData;
+    departments.value = departmentsData;
+    users.value = usersData.map(mapUser);
   } catch (err) {
-    error.value = err.response?.data?.message || 'Failed to fetch roles or departments.';
+    error.value = err.message || 'Failed to fetch data.';
     notyf.error(error.value);
   } finally {
     loading.value = false;
   }
-};
-
-const createUser = async (formData) => {
-  return apiInstance.post('/users', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }).then(res => res.data.user);
-};
-
-const updateUser = async (id, formData) => {
-  return apiInstance.post(`/users/${id}`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }).then(res => res.data.user);
-};
-
-const deleteUser = async (id) => {
-  await apiInstance.delete(`/users/${id}`);
 };
 
 // Form validation
@@ -334,7 +301,6 @@ const submitForm = async () => {
     formError.value = null;
 
     if (editing.value) {
-      // Optimistic update
       const index = users.value.findIndex(u => u.id === editId.value);
       if (index !== -1) {
         const originalUser = { ...users.value[index] };
@@ -349,16 +315,15 @@ const submitForm = async () => {
           }),
         };
         try {
-          const updatedUser = await updateUser(editId.value, formData);
-          users.value[index] = mapUser(updatedUser);
+          const updatedUser = await updateUser(editId.value, form.value);
+          users.value[index] = mapUser(updatedUser.user);
           notyf.success('User updated successfully!');
         } catch (err) {
-          users.value[index] = originalUser; // Revert on error
+          users.value[index] = originalUser;
           throw err;
         }
       }
     } else {
-      // Optimistic create
       const tempId = `temp-${Date.now()}`;
       users.value.unshift({
         ...mapUser({
@@ -369,23 +334,20 @@ const submitForm = async () => {
           department_id: form.value.department_id,
           image_url: form.value.image ? URL.createObjectURL(form.value.image) : null,
         }),
-othèque
-
       });
       try {
-       coffee
-        const newUser = await createUser(formData);
-        users.value = users.value.map(u => (u.id === tempId ? mapUser(newUser) : u));
-        notyf.success('User in created successfully!');
+        const newUser = await createUser(form.value);
+        users.value = users.value.map(u => (u.id === tempId ? mapUser(newUser.user) : u));
+        notyf.success('User created successfully!');
       } catch (err) {
-        users.value = users.value.filter(u => u.id !== tempId); // Revert on error
+        users.value = users.value.filter(u => u.id !== tempId);
         throw err;
       }
     }
     showModal.value = false;
     resetForm();
   } catch (err) {
-    formError.value = err.response?.data?.message || `Failed to ${editing.value ? 'update' : 'create'} user.`;
+    formError.value = err.message || `Failed to ${editing.value ? 'update' : 'create'} user.`;
     notyf.error(formError.value);
   } finally {
     formLoading.value = false;
@@ -407,6 +369,7 @@ const openEditModal = (user) => {
     email: user.email || '',
     password: '',
     role_id: user.role_id || '',
+
     department_id: user.department_id || '',
     image: null,
   };
@@ -414,7 +377,7 @@ const openEditModal = (user) => {
   showModal.value = true;
 };
 
-const deleteUserDirectly = async (id) => {
+const removeUserConfirmed = async (id) => {
   const index = users.value.findIndex(u => u.id === id);
   if (index === -1) return;
   const originalUser = { ...users.value[index] };
@@ -424,8 +387,8 @@ const deleteUserDirectly = async (id) => {
     users.value = users.value.filter(u => u.id !== id);
     notyf.success('User deleted successfully!');
   } catch (err) {
-    users.value[index] = originalUser; // Revert on error
-    error.value = err.response?.data?.message || 'Failed to delete user.';
+    users.value[index] = originalUser;
+    error.value = err.message || 'Failed to delete user.';
     notyf.error(error.value);
   }
 };
@@ -477,10 +440,7 @@ const viewUser = (user) => {
 };
 
 // Lifecycle hooks
-onMounted(async () => {
-  await fetchRolesAndDepartments();
-  await fetchUsers();
-});
+onMounted(fetchData);
 
 onUnmounted(() => {
   if (imagePreview.value) URL.revokeObjectURL(imagePreview.value);
