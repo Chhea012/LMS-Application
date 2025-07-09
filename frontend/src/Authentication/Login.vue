@@ -36,9 +36,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import api from '../plugin/axios'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
+import api from '@/plugin/axios' // your custom axios instance
+import axios from 'axios'        // default axios for csrf cookie
 
 const router = useRouter()
 const email = ref('')
@@ -50,16 +50,28 @@ const handleLogin = async () => {
   error.value = null
   success.value = null
   try {
-    await axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie', { withCredentials: true })
+    // 1. Get CSRF cookie (needed for Sanctum)
+    await axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie', {
+      withCredentials: true,
+    })
 
+    // 2. Login API request
     const res = await api.post('/login', {
       email: email.value,
       password: password.value,
     })
 
-    localStorage.setItem('token', res.data.token)
+    // 3. Save token to localStorage
+    const token = res.data.token
+    localStorage.setItem('token', token)
+
+    // 4. Immediately set token in Axios headers
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+    // 5. Show success message
     success.value = '🎉 Login successful! Redirecting...'
 
+    // 6. Redirect to home after 1.5s
     setTimeout(() => {
       router.push('/')
     }, 1500)

@@ -10,6 +10,16 @@ const apiInstance = axios.create({
   },
 });
 
+
+// ✅ Add Authorization header from localStorage
+apiInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 apiInstance.interceptors.response.use(
   (response) => response,
   (error) => {

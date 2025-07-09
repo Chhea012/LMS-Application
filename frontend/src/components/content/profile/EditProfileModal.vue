@@ -1,126 +1,200 @@
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, onUnmounted } from "vue";
+import api from "@/plugin/axios";
 
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    required: true,
-  },
-  profile: {
-    type: Object,
-    required: true,
-  }
+  modelValue: { type: Boolean, required: true },
+  profile: { type: Object, required: true }, // fullName, email, imageUrl, imageFile
 });
 
-const emits = defineEmits(['update:modelValue', 'update:profile', 'save']);
+const emits = defineEmits(["update:modelValue", "update:profile", "save"]);
+const showImagePreview = ref(false);
+const isSaving = ref(false);
+
+let previousObjectUrl = null;
 
 function close() {
-  emits('update:modelValue', false);
+  emits("update:modelValue", false);
+  showImagePreview.value = false;
+
+  if (previousObjectUrl) {
+    URL.revokeObjectURL(previousObjectUrl);
+    previousObjectUrl = null;
+  }
 }
 
 function updateProfileField(field, value) {
-  emits('update:profile', { ...props.profile, [field]: value });
+  emits("update:profile", { ...props.profile, [field]: value });
 }
 
-function save() {
-  emits('save');
-}
-
-// Handle image file input change
 function onImageChange(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    // Emit updated profile with new image URL (base64)
-    emits('update:profile', { ...props.profile, imageUrl: e.target.result });
-  };
-  reader.readAsDataURL(file);
+  // Revoke previous object URL for preview
+  if (previousObjectUrl) {
+    URL.revokeObjectURL(previousObjectUrl);
+  }
+
+  const objectUrl = URL.createObjectURL(file);
+  previousObjectUrl = objectUrl;
+
+  emits("update:profile", {
+    ...props.profile,
+    imageFile: file,
+    imageUrl: objectUrl,
+  });
+}
+
+function openImagePreview() {
+  if (props.profile.imageUrl) {
+    showImagePreview.value = true;
+  }
+}
+
+onUnmounted(() => {
+  if (previousObjectUrl) {
+    URL.revokeObjectURL(previousObjectUrl);
+  }
+});
+
+async function save() {
+  try {
+    isSaving.value = true;
+
+    const formData = new FormData();
+    formData.append("full_name", props.profile.fullName || "");
+    formData.append("email", props.profile.email || "");
+    if (props.profile.imageFile) {
+      formData.append("image", props.profile.imageFile);
+    }
+
+    await api.put("/profile", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    alert("Profile updated successfully!");
+    emits("update:modelValue", false);
+    emits("save"); // parent component can listen to this to reload data
+  } catch (err) {
+    if (err.response) {
+      // Server responded with status code outside 2xx
+      console.error("API error response:", err.response.data);
+      alert(
+        "Failed to update profile: " +
+          (err.response.data.message || JSON.stringify(err.response.data))
+      );
+    } else if (err.request) {
+      // No response received
+      console.error("No response received:", err.request);
+      alert("Failed to update profile: No response from server");
+    } else {
+      // Something else caused error
+      console.error("Error", err.message);
+      alert("Failed to update profile: " + err.message);
+    }
+  } finally {
+    isSaving.value = false;
+  }
 }
 </script>
 
 <template>
   <div
     v-if="modelValue"
-    class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+    class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
     @click.self="close"
   >
-    <div class="bg-white rounded-lg w-full max-w-2xl p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-semibold text-gray-900">Edit Profile</h3>
+    <div class="bg-white rounded-xl w-[34%] max-w-2xl p-10 shadow-lg space-y-6">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold">Edit Profile</h2>
         <button
           @click="close"
-          class="text-gray-600 hover:text-gray-900 text-xl font-bold"
-          aria-label="Close"
+          :disabled="isSaving"
+          class="text-gray-500 hover:text-black text-xl disabled:opacity-50"
         >
-          ✕
+          ×
         </button>
       </div>
 
-      <!-- Image preview and upload -->
-      <div class="mb-4">
+      <div class="text-center">
         <img
-          :src="profile.imageUrl"
+          :src="
+            profile.imageUrl || 'https://via.placeholder.com/150?text=No+Image'
+          "
           alt="Profile Image"
-          class="w-32 h-32 rounded-lg object-cover border-2 border-gray-300 mb-2"
+          class="w-28 h-28 mx-auto rounded-full object-cover border-2 border-gray-300 cursor-pointer hover:scale-105 transition"
+          @click="openImagePreview"
         />
-        <input type="file" @change="onImageChange" />
+        <input
+          type="file"
+          class="mt-2 text-sm"
+          @change="onImageChange"
+          :disabled="isSaving"
+        />
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid md:grid-cols gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+          <label class="block text-sm font-medium">Full Name</label>
           <input
             type="text"
             class="w-full px-4 py-2 border rounded-md"
             :value="profile.fullName"
-            @input="e => updateProfileField('fullName', e.target.value)"
+            @input="(e) => updateProfileField('fullName', e.target.value)"
+            :disabled="isSaving"
           />
         </div>
+
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label class="block text-sm font-medium">Email</label>
           <input
             type="email"
             class="w-full px-4 py-2 border rounded-md"
             :value="profile.email"
-            @input="e => updateProfileField('email', e.target.value)"
-          />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-          <input
-            type="text"
-            class="w-full px-4 py-2 border rounded-md"
-            :value="profile.jobTitle"
-            @input="e => updateProfileField('jobTitle', e.target.value)"
-          />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
-          <input
-            type="text"
-            class="w-full px-4 py-2 border rounded-md"
-            :value="profile.department"
-            @input="e => updateProfileField('department', e.target.value)"
+            @input="(e) => updateProfileField('email', e.target.value)"
+            :disabled="isSaving"
           />
         </div>
       </div>
 
-      <div class="mt-6 flex justify-end space-x-4">
+      <div class="flex justify-end gap-3">
         <button
           @click="close"
-          class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+          :disabled="isSaving"
+          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           @click="save"
-          class="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          :disabled="isSaving"
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          Save
+          {{ isSaving ? "Saving..." : "Save" }}
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Fullscreen Image Preview -->
+  <div
+    v-if="showImagePreview"
+    class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+    @click="showImagePreview = false"
+  >
+    <img
+      :src="profile.imageUrl"
+      alt="Full Image"
+      class="max-w-full max-h-full rounded-lg"
+    />
+  </div>
 </template>
+
+<style scoped>
+input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+</style>
