@@ -13,10 +13,25 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index()
+    // {
+    //     $users = User::all()->map(function ($user) {
+    //         $user->image_url = $user->image ? asset('storage/' . $user->image) : null;
+    //         return $user;
+    //     });
+
+    //     return response()->json([
+    //         'status' => 'successfully!',
+    //         'users' => $users
+    //     ]);
+    // }
+
     public function index()
     {
-        $users = User::all()->map(function ($user) {
+        $users = User::with('role', 'department')->get()->map(function ($user) {
             $user->image_url = $user->image ? asset('storage/' . $user->image) : null;
+            $user->role_name = $user->role ? $user->role->role_name : null;
+            $user->department_name = $user->department ? $user->department->department_name : null;
             return $user;
         });
 
@@ -25,6 +40,8 @@ class UserController extends Controller
             'users' => $users
         ]);
     }
+
+
 
     /**
      * Store a newly created resource in storage.

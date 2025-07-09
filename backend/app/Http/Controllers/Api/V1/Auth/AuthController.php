@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller; // Don't forget to import Controller base c
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -80,4 +83,58 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function update(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+
+            $request->validate([
+                'full_name' => 'nullable|string|max:255',
+                'email' => 'nullable|email|unique:users,email,' . $user->id,
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            // Update name and email if present, or set null explicitly
+            if ($request->has('full_name')) {
+                $user->full_name = $request->input('full_name');  // can be null
+            }
+
+            if ($request->has('email')) {
+                $user->email = $request->input('email');  // can be null
+            }
+
+            // Handle image upload if present
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($user->image) {
+                    Storage::disk('public')->delete($user->image);
+                }
+
+                $path = $request->file('image')->store('profile_images', 'public');
+                $user->image = $path;
+            }
+
+            $user->save();
+
+            return response()->json([
+                'message' => 'Profile updated successfully',
+                'user' => $user,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $ve) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $ve->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Update profile error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Update failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }
