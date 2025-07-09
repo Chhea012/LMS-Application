@@ -122,19 +122,34 @@
         </h3>
 
         <form @submit.prevent="isEditing ? updateRequest() : createRequest()">
+          <!-- USER SELECT DROPDOWN -->
           <div class="mb-4">
-            <label class="block mb-1 font-medium" for="user_id">User ID</label>
-            <input id="user_id" v-model="form.user_id" type="text" required class="w-full border rounded px-3 py-2" />
+            <label class="block mb-1 font-medium" for="user_id">User</label>
+            <select id="user_id" v-model="form.user_id" required class="w-full border rounded px-3 py-2">
+              <option value="" disabled>Select user</option>
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.full_name }}
+              </option>
+            </select>
           </div>
+
+          <!-- PERMISSION TYPE SELECT DROPDOWN -->
           <div class="mb-4">
-            <label class="block mb-1 font-medium" for="permission_type_id">Permission Type ID</label>
-            <input id="permission_type_id" v-model="form.permission_type_id" type="text" required
-              class="w-full border rounded px-3 py-2" />
+            <label class="block mb-1 font-medium" for="permission_type_id">Permission Type</label>
+            <select id="permission_type_id" v-model="form.permission_type_id" required
+              class="w-full border rounded px-3 py-2">
+              <option value="" disabled>Select permission type</option>
+              <option v-for="type in permissionTypes" :key="type.id" :value="type.id">
+                {{ type.name }}
+              </option>
+            </select>
           </div>
+
           <div class="mb-4">
             <label class="block mb-1 font-medium" for="reason">Reason</label>
             <textarea id="reason" v-model="form.reason" required class="w-full border rounded px-3 py-2"></textarea>
           </div>
+
           <div class="mb-4">
             <label class="block mb-1 font-medium" for="status">Status</label>
             <select id="status" v-model="form.status" required class="w-full border rounded px-3 py-2">
@@ -161,6 +176,7 @@
         </button>
       </div>
     </div>
+
 
     <!-- Delete Confirm Modal -->
     <div v-if="showDeleteConfirm !== null"
@@ -196,6 +212,8 @@ import { ref, onMounted, computed } from 'vue'
 import api from '@/plugin/axios.js'
 
 const permissionRequests = ref([])
+const users = ref([])
+const permissionTypes = ref([])
 const selectedStatus = ref('')
 const searchQuery = ref('')
 const loading = ref(true)
@@ -217,7 +235,7 @@ const showDeleteConfirm = ref(null)
 const toast = ref({
   visible: false,
   message: '',
-  type: 'success', // or 'error'
+  type: 'success',
 })
 
 function showToast(message, type = 'success') {
@@ -243,8 +261,33 @@ async function fetchRequests() {
   }
 }
 
+
+async function fetchUsers() {
+  try {
+    const res = await api.get('/users')
+    users.value = Array.isArray(res.data.users) ? res.data.users : []
+    console.log('Users response:', users.value)
+  } catch (err) {
+    showToast('Failed to fetch users.', 'error')
+  }
+}
+
+
+async function fetchPermissionTypes() {
+  try {
+    const res = await api.get('/permissiontypes')
+    console.log('Permission types raw response:', res.data)  // <-- added log here
+    permissionTypes.value = Array.isArray(res.data.permission_types) ? res.data.permission_types : []
+  } catch (err) {
+    showToast('Failed to fetch permission types.', 'error')
+  }
+}
+
+
 onMounted(() => {
   fetchRequests()
+  fetchUsers()
+  fetchPermissionTypes()
 })
 
 const filteredPermissions = computed(() => {
@@ -274,7 +317,13 @@ function openCreatePopup() {
 }
 
 function openEditPopup(request) {
-  form.value = { ...request }
+  form.value = {
+    id: request.id,
+    user_id: request.user?.id || request.user_id || '',
+    permission_type_id: request.permission_type?.id || request.permission_type_id || '',
+    reason: request.reason,
+    status: request.status,
+  }
   isEditing.value = true
   showPopup.value = true
 }
@@ -342,6 +391,7 @@ async function deleteRequest(id) {
   }
 }
 </script>
+
 
 <style>
 .fade-enter-active,
