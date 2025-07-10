@@ -11,24 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('permission_requests', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('permission_type_id');
-            $table->text('reason')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('permission_type_id')->references('id')->on('permission_types')->onDelete('cascade');
+        Schema::table('permission_requests', function (Blueprint $table) {
+            $table->date('date_leave')->nullable()->after('reason');
+            $table->boolean('leave_morning')->default(false)->after('date_leave');
+            $table->boolean('leave_afternoon')->default(false)->after('leave_morning');
+            $table->date('date_back')->nullable()->after('leave_afternoon');
+            $table->boolean('back_morning')->default(false)->after('date_back');
+            $table->boolean('back_afternoon')->default(false)->after('back_morning');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('permission_requests');
+        Schema::table('permission_requests', function (Blueprint $table) {
+            $table->dropColumn(['date_leave', 'leave_morning', 'leave_afternoon', 'date_back', 'back_morning', 'back_afternoon']);
+        });
     }
 };

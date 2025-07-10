@@ -9,7 +9,26 @@ use Illuminate\Support\Carbon;
 class PermissionRequest extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'permission_type_id', 'reason', 'status'];
+
+    protected $fillable = [
+        'user_id',
+        'permission_type_id',
+        'reason',
+        'date_leave',
+        'leave_morning',
+        'leave_afternoon',
+        'date_back',
+        'back_morning',
+        'back_afternoon',
+        'status'
+    ];
+
+    protected $casts = [
+        'leave_morning' => 'boolean',
+        'leave_afternoon' => 'boolean',
+        'back_morning' => 'boolean',
+        'back_afternoon' => 'boolean',
+    ];
 
     public function user()
     {

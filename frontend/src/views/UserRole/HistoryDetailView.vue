@@ -1,6 +1,7 @@
 <template>
+  <Navbar />
+
   <div class="p-6 min-h-screen bg-gradient-to-br from-white via-teal-50 to-white">
-    <Navbar />
 
     <div class="max-w-7xl mx-auto">
       <div class="flex items-center justify-between mb-8">
