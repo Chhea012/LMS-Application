@@ -27,7 +27,17 @@ class PermissionRequestController extends Controller
             'permission_type_id'  => 'required|exists:permission_types,id',
             'reason'              => 'nullable|string',
             'status'              => 'in:pending,approved,rejected',
+
+            'date_leave'          => 'required|date',
+            'leave_morning'       => 'boolean',
+            'leave_afternoon'     => 'boolean',
+
+            'date_back'           => 'required|date',
+            'back_morning'        => 'boolean',
+            'back_afternoon'      => 'boolean',
         ]);
+
+        $validated['status'] = $validated['status'] ?? 'pending';
 
         $permissionRequest = PermissionRequest::create($validated);
 
@@ -67,6 +77,14 @@ class PermissionRequestController extends Controller
             'permission_type_id'  => 'required|exists:permission_types,id',
             'reason'              => 'nullable|string',
             'status'              => 'in:pending,approved,rejected',
+
+            'date_leave'          => 'required|date',
+            'leave_morning'       => 'boolean',
+            'leave_afternoon'     => 'boolean',
+
+            'date_back'           => 'required|date',
+            'back_morning'        => 'boolean',
+            'back_afternoon'      => 'boolean',
         ]);
 
         $permissionRequest->update($validated);
