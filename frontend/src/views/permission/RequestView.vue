@@ -60,7 +60,12 @@
             <td class="px-4 py-3">{{ index + 1 }}</td>
             <td class="px-4 py-3">{{ permissionRequest.user?.full_name || 'N/A' }}</td>
             <td class="px-4 py-3">{{ permissionRequest.permission_type?.name || 'N/A' }}</td>
-            <td class="px-4 py-3">{{ permissionRequest.reason }}</td>
+            <td class="px-4 py-3">
+              <button @click="openReasonPopup(permissionRequest.reason)"
+                class="text-blue-600 hover:underline">
+                View Reason
+              </button>
+            </td>
             <td class="px-4 py-3">
               <span :class="[
                 'px-3 py-1 rounded-full text-xs font-medium',
@@ -93,6 +98,16 @@
                   <button @click="() => { openEditPopup(permissionRequest); closeActionMenu(); }"
                     class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     Edit
+                  </button>
+                  <button v-if="permissionRequest.status !== 'approved'"
+                    @click="() => { updateRequestStatus(permissionRequest.id, 'approved'); closeActionMenu(); }"
+                    class="block w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-gray-100">
+                    Approve
+                  </button>
+                  <button v-if="permissionRequest.status !== 'rejected'"
+                    @click="() => { updateRequestStatus(permissionRequest.id, 'rejected'); closeActionMenu(); }"
+                    class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                    Reject
                   </button>
                   <button @click="() => { showDeleteConfirm = permissionRequest.id; closeActionMenu(); }"
                     class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
@@ -160,6 +175,24 @@
       </div>
     </div>
 
+    <!-- Reason View Popup -->
+    <div v-if="showReasonPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+        <h3 class="text-xl font-semibold mb-4">Reason Details</h3>
+        <p class="mb-4 text-gray-700">{{ currentReason }}</p>
+        <div class="flex justify-end">
+          <button @click="closeReasonPopup" class="px-4 py-2 border rounded hover:bg-gray-100">
+            Close
+          </button>
+        </div>
+        <button @click="closeReasonPopup"
+          class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-2xl font-bold leading-none"
+          aria-label="Close reason popup">
+          ×
+        </button>
+      </div>
+    </div>
+
     <!-- Delete Confirm Modal -->
     <div v-if="showDeleteConfirm !== null"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -205,6 +238,8 @@ const error = ref(null)
 const actionMenuOpenId = ref(null)
 const showPopup = ref(false)
 const isEditing = ref(false)
+const showReasonPopup = ref(false)
+const currentReason = ref('')
 const form = ref({
   id: null,
   user_id: '',
@@ -308,6 +343,16 @@ function openEditPopup(request) {
   showPopup.value = true
 }
 
+function openReasonPopup(reason) {
+  currentReason.value = reason
+  showReasonPopup.value = true
+}
+
+function closeReasonPopup() {
+  showReasonPopup.value = false
+  currentReason.value = ''
+}
+
 function closePopup() {
   showPopup.value = false
   resetForm()
@@ -374,8 +419,8 @@ async function updateRequestStatus(id, status) {
   try {
     await api.put(`/permissionrequests/${id}`, { status })
     showToast(`${status.charAt(0).toUpperCase() + status.slice(1)} successfully!`, 'success')
-    fetchRequests() // Refresh the table
-    emit('refresh-requests') // Notify parent to refresh notifications
+    fetchRequests()
+    emit('refresh-requests')
   } catch (error) {
     console.error(`Failed to ${status} request:`, error)
     showToast(`Failed to ${status} request.`, 'error')
@@ -384,7 +429,7 @@ async function updateRequestStatus(id, status) {
 
 defineExpose({
   updateRequestStatus,
-  fetchRequests // Expose fetchRequests for parent to call
+  fetchRequests
 })
 </script>
 
