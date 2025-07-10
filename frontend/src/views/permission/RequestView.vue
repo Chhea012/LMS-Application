@@ -45,12 +45,12 @@
       <table class="min-w-full bg-white rounded-lg shadow-md border text-sm">
         <thead class="bg-blue-100 text-blue-800 uppercase font-semibold">
           <tr>
-            <th class="px-4 py-3 text-left">Display ID</th>
-            <th class="px-4 py-3 text-left">Manager Name</th>
+            <th class="px-4 py-3 text-left">#</th>
+            <th class="px-4 py-3 text-left">Manager </th>
             <th class="px-4 py-3 text-left">Permission Type</th>
             <th class="px-4 py-3 text-left">Reason</th>
             <th class="px-4 py-3 text-left">Status</th>
-            <th class="px-4 py-3 text-left">Created At</th>
+            <th class="px-4 py-3 text-left">Created </th>
             <th class="px-4 py-3 text-left">Actions</th>
           </tr>
         </thead>

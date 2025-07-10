@@ -16,7 +16,7 @@
     <table v-else class="min-w-full bg-white shadow-md rounded overflow-hidden">
       <thead class="bg-gray-100">
         <tr>
-          <th class="py-3 px-4 text-left">ID</th>
+          <th class="py-3 px-4 text-left">#</th>
           <th class="py-3 px-4 text-left">Image</th>
           <th class="py-3 px-4 text-left">Name</th>
           <th class="py-3 px-4 text-left">Email</th>
