@@ -1,7 +1,9 @@
 
 <template>
+  <Navbar />
+
   <div class="p-6 min-h-screen bg-gradient-to-br from-white via-teal-50 to-white">
-    <Navbar />
+
 
     <div class="mb-8 flex justify-between items-center">
       <button
