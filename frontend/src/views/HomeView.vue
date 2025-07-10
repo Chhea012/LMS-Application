@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto p-4">
-    <div class="grid grid-cols-4 gap-4 mb-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
       <div class="bg-white shadow-lg rounded-lg p-4 flex items-center justify-between w-full">
         <div class="flex items-center">
           <div class="bg-blue-500 text-white w-12 h-12 flex items-center justify-center rounded mr-4">
@@ -54,7 +54,7 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="bg-white p-4 rounded-lg shadow">
         <h3 class="text-lg mb-2">User Statistics</h3>
         <div style="position: relative; height: 300px;">
@@ -87,19 +87,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Line } from 'vue-chartjs';
-import { Pie } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale, ArcElement } from 'chart.js';
-import apiInstance from '@/plugin/axios';
+import { ref, onMounted } from 'vue'
+import { Line, Pie } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale, ArcElement } from 'chart.js'
+import apiInstance from '@/plugin/axios'
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale, ArcElement);
+ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale, CategoryScale, ArcElement)
 
-// Reactive variables for API data
-const totalUsers = ref(0);
-const totalEmployees = ref(0);
-const totalManagers = ref(0);
-const totalDepartments = ref(0);
+const totalUsers = ref(0)
+const totalEmployees = ref(0)
+const totalManagers = ref(0)
+const totalDepartments = ref(0)
 const permissionData = ref({
   labels: ['Pending', 'Approved', 'Rejected'],
   datasets: [
@@ -109,40 +107,40 @@ const permissionData = ref({
       hoverOffset: 4,
     },
   ],
-});
+})
 
-// Fetch data from API
 const fetchDashboardData = async () => {
   try {
-    // Fetch users
-    const usersResponse = await apiInstance.get('/users');
-    const users = usersResponse.data.users || [];
-    totalUsers.value = users.length;
-    totalEmployees.value = users.filter(user => user.role_id === 4).length; // Employee role_id
-    totalManagers.value = users.filter(user => user.role_id === 3).length; // Manager role_id
+    const usersResponse = await apiInstance.get('/users', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    })
+    const users = usersResponse.data.users || []
+    totalUsers.value = users.length
+    totalEmployees.value = users.filter(user => user.role_id === 4).length
+    totalManagers.value = users.filter(user => user.role_id === 3).length
 
-    // Fetch departments
-    const departmentsResponse = await apiInstance.get('/department');
-    totalDepartments.value = departmentsResponse.data.department.length;
+    const departmentsResponse = await apiInstance.get('/department', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    })
+    totalDepartments.value = departmentsResponse.data.department.length
 
-    // Fetch permission requests
-    const permissionsResponse = await apiInstance.get('/permissionrequests');
-    const permissions = permissionsResponse.data || [];
+    const permissionsResponse = await apiInstance.get('/permissionrequests', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    })
+    const permissions = permissionsResponse.data || []
 
-    // Sum the status counts
     const statusCounts = {
       pending: 0,
       approved: 0,
       rejected: 0,
-    };
+    }
 
     permissions.forEach(permission => {
       if (permission.status in statusCounts) {
-        statusCounts[permission.status]++;
+        statusCounts[permission.status.toLowerCase()]++
       }
-    });
+    })
 
-    // Update permissionData for the Pie chart
     permissionData.value = {
       labels: ['Pending', 'Approved', 'Rejected'],
       datasets: [
@@ -152,16 +150,14 @@ const fetchDashboardData = async () => {
           hoverOffset: 4,
         },
       ],
-    };
+    }
   } catch (error) {
-    console.error('Error fetching dashboard data:', error);
+    console.error('Error fetching dashboard data:', error)
   }
-};
+}
 
-// Call fetchDashboardData when component is mounted
-onMounted(fetchDashboardData);
+onMounted(fetchDashboardData)
 
-// User statistics chart data (unchanged since no API data provided for this)
 const userStatsData = ref({
   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   datasets: [
@@ -187,35 +183,29 @@ const userStatsData = ref({
       fill: true,
     },
   ],
-});
+})
 
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
-});
+})
 
 const permissionOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    legend: {
-      display: true, // Show the legend
-      position: 'bottom',
-    },
-    title: {
-      display: true,
-      text: 'Permission Status',
-    },
+    legend: { display: true, position: 'bottom' },
+    title: { display: true, text: 'Permission Status' },
     tooltip: {
       enabled: true,
       callbacks: {
-        label: function(context) {
-          let label = context.label || '';
-          let value = context.raw || 0;
-          return `${label}: ${value}`;
+        label: function (context) {
+          let label = context.label || ''
+          let value = context.raw || 0
+          return `${label}: ${value}`
         },
       },
     },
   },
-});
+})
 </script>
