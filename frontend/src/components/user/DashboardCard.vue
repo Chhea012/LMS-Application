@@ -1,7 +1,6 @@
-
 <template>
   <div
-    class="bg-white shadow-lg rounded-xl p-6 transition-transform"
+    class="bg-white shadow-lg rounded-xl p-6 transition-transform hover:shadow-xl"
     :class="[$attrs.class]"
     @click="$emit('click')"
   >
@@ -20,3 +19,10 @@ defineProps({
 
 defineEmits(['click'])
 </script>
+
+<style scoped>
+/* Ensure hover effect is smooth */
+div {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+</style>
