@@ -1,5 +1,11 @@
 import api from '@/plugin/axios';
 
+const getUserImageUrl = (user) => {
+  if (user.image_url) return user.image_url;
+  if (user.image) return `http://127.0.0.1:8000/storage/${user.image}`;
+  return 'https://via.placeholder.com/40';
+};
+
 export const getUsers = async () => {
   try {
     const [usersRes, rolesRes, deptsRes] = await Promise.all([
@@ -8,34 +14,23 @@ export const getUsers = async () => {
       api.get('/department'),
     ]);
 
-    console.log('Users response:', usersRes.data);
-    console.log('Roles response:', rolesRes.data);
-    console.log('Departments response:', deptsRes.data);
-
-    // Normalize user data
     const users = Array.isArray(usersRes.data.users)
       ? usersRes.data.users
       : Array.isArray(usersRes.data)
       ? usersRes.data
       : [];
 
-    // Normalize roles data
     const roles = Array.isArray(rolesRes.data.roles)
       ? rolesRes.data.roles
       : Array.isArray(rolesRes.data)
       ? rolesRes.data
       : [];
 
-    // Normalize departments data (fix: use 'department' key)
     const departments = Array.isArray(deptsRes.data.department)
       ? deptsRes.data.department
       : Array.isArray(deptsRes.data)
       ? deptsRes.data
       : [];
-
-    console.log('Parsed users:', users);
-    console.log('Parsed roles:', roles);
-    console.log('Parsed departments:', departments);
 
     return users.map((user) => {
       const role = roles.find((r) => r.id === user.role_id);
@@ -44,6 +39,7 @@ export const getUsers = async () => {
         ...user,
         role_name: role ? role.role_name : 'Unknown',
         department_name: dept ? dept.name : 'Unknown',
+        image_url: getUserImageUrl(user),
       };
     });
   } catch (error) {
@@ -86,7 +82,7 @@ export const updateUser = async (id, userData) => {
   if (userData.image) {
     formData.append('image', userData.image);
   }
-  formData.append('_method', 'PUT'); // Explicitly add _method for Laravel
+  formData.append('_method', 'PUT'); // Laravel uses POST + _method override
 
   try {
     const response = await api.post(`/users/${id}`, formData, {
@@ -112,7 +108,6 @@ export const deleteUser = async (id) => {
 export const getRoles = async () => {
   try {
     const res = await api.get('/roles');
-    console.log('Roles fetched:', res.data);
     return Array.isArray(res.data.roles) ? res.data.roles : Array.isArray(res.data) ? res.data : [];
   } catch (error) {
     console.error('Error fetching roles:', error.response || error);
@@ -123,7 +118,6 @@ export const getRoles = async () => {
 export const getDepartments = async () => {
   try {
     const res = await api.get('/department');
-    console.log('Departments fetched:', res.data);
     return Array.isArray(res.data.department) ? res.data.department : Array.isArray(res.data) ? res.data : [];
   } catch (error) {
     console.error('Error fetching departments:', error.response || error);

@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable; // Correct base class for auth
+use Laravel\Sanctum\HasApiTokens;                      // Needed for Sanctum tokens
 use Illuminate\Support\Carbon;
+// use Laravel\Sanctum\HasApiTokens;
 
-class User extends Model
+class User extends Authenticatable
 {
-    use HasFactory;
-    // app/Models/User.php
+    use HasFactory, HasApiTokens; // Added HasApiTokens
 
     protected $fillable = [
         'full_name',
@@ -18,10 +19,8 @@ class User extends Model
         'role_id',
         'department_id',
         'image',
+        'is_active',
     ];
-
-
-
 
     public function role()
     {
@@ -52,15 +51,25 @@ class User extends Model
     {
         return $this->hasMany(AuditLog::class);
     }
+
     // Format created_at
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->format('F d, Y');
     }
 
-    // Format updated_at
+    // Format updated_at date
     public function getUpdatedAtAttribute($value)
     {
         return Carbon::parse($value)->format('F d, Y');
+    }
+
+    // Get full URL for image if exists
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
+        return null;
     }
 }

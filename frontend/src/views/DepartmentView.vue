@@ -12,24 +12,12 @@
 
     <p class="text-gray-700 mb-4">List of departments and their heads.</p>
 
-    <!-- Search input -->
-    <!-- <div class="mb-4">
-      <input
-        type="text"
-        v-model="searchQuery"
-        placeholder="Search departments..."
-        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500"
-      />
-    </div> -->
-
     <div class="bg-white shadow rounded-lg border border-gray-200">
       <table v-if="filteredDepartments.length" class="w-full text-left">
         <thead class="bg-gray-100">
           <tr>
             <th class="px-6 py-3 font-medium text-gray-700">Department Name</th>
-            <th class="px-6 py-3 font-medium text-gray-700">
-              Head of Department
-            </th>
+            <th class="px-6 py-3 font-medium text-gray-700">Head of Department</th>
             <th class="px-6 py-3 font-medium text-gray-700">Action</th>
           </tr>
         </thead>
@@ -49,7 +37,6 @@
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  <!-- Vertical three dots icon -->
                   <svg
                     class="w-6 h-6 text-gray-600 hover:text-gray-900"
                     fill="currentColor"
@@ -62,13 +49,24 @@
                   </svg>
                 </button>
 
-                <!-- Dropdown menu -->
                 <transition name="fade">
                   <div
                     v-if="menuOpenId === dept.id"
                     class="origin-top-right absolute right-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
                   >
                     <div class="py-1 flex flex-col">
+                      <button
+                        @click="
+                          () => {
+                            selectedDepartment = dept;
+                            showDetailModal = true;
+                            closeMenu();
+                          }
+                        "
+                        class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
+                      >
+                        View
+                      </button>
                       <button
                         @click="
                           () => {
@@ -83,7 +81,8 @@
                       <button
                         @click="
                           () => {
-                            deleteDepartment(dept.id);
+                            showDeleteModal = true;
+                            deleteId = dept.id;
                             closeMenu();
                           }
                         "
@@ -105,7 +104,7 @@
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Create/Edit Modal -->
     <div
       v-if="showModal"
       class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
@@ -116,9 +115,7 @@
         </h2>
 
         <form @submit.prevent="submitForm">
-          <label class="block mb-2 font-medium text-gray-700"
-            >Department Name</label
-          >
+          <label class="block mb-2 font-medium text-gray-700">Department Name</label>
           <input
             v-model="form.name"
             type="text"
@@ -126,9 +123,7 @@
             class="w-full px-3 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring focus:border-blue-500"
           />
 
-          <label class="block mb-2 font-medium text-gray-700"
-            >Head of Department</label
-          >
+          <label class="block mb-2 font-medium text-gray-700">Head of Department</label>
           <select
             v-model="form.head_user_id"
             class="w-full px-3 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring focus:border-blue-500"
@@ -158,6 +153,56 @@
         </form>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      v-if="showDeleteModal"
+      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-lg shadow-lg w-96 p-6">
+        <h2 class="text-lg font-semibold text-red-600 mb-4">Confirm Deletion</h2>
+        <p class="text-gray-700 mb-6">
+          Are you sure you want to delete this department? This action cannot be undone.
+        </p>
+        <div class="flex justify-end space-x-4">
+          <button
+            class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+            @click="() => { showDeleteModal = false; deleteId = null; }"
+          >
+            Cancel
+          </button>
+          <button
+            class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+            @click="deleteDepartment"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Detail Modal -->
+    <div
+      v-if="showDetailModal"
+      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-lg shadow-lg w-96 p-6">
+        <h2 class="text-xl font-semibold text-blue-600 mb-4">Department Details</h2>
+        <div class="mb-4">
+          <p><strong class="text-gray-700">Name:</strong> {{ selectedDepartment?.name }}</p>
+          <p><strong class="text-gray-700">Head:</strong> {{ selectedDepartment?.head?.full_name || "—" }}</p>
+          <p><strong class="text-gray-700">ID:</strong> {{ selectedDepartment?.id }}</p>
+        </div>
+        <div class="flex justify-end">
+          <button
+            class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+            @click="() => { showDetailModal = false; selectedDepartment = null; }"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -170,8 +215,13 @@ const departments = ref([]);
 const users = ref([]);
 
 const showModal = ref(false);
+const showDeleteModal = ref(false);
+const showDetailModal = ref(false);
+const selectedDepartment = ref(null);
+
 const loading = ref(false);
 const isEdit = ref(false);
+const deleteId = ref(null);
 
 const form = reactive({
   id: null,
@@ -179,13 +229,9 @@ const form = reactive({
   head_user_id: "",
 });
 
-// To track which row's menu is open
 const menuOpenId = ref(null);
-
-// Search query state
 const searchQuery = ref("");
 
-// Process departments to keep latest 10 by id descending
 const processDepartments = (list) => {
   return [...list].sort((a, b) => b.id - a.id).slice(0, 10);
 };
@@ -208,7 +254,6 @@ const fetchUsers = async () => {
   }
 };
 
-// Computed filtered list based on search query
 const filteredDepartments = computed(() => {
   if (!searchQuery.value.trim()) return departments.value;
   return departments.value.filter((dept) =>
@@ -216,7 +261,6 @@ const filteredDepartments = computed(() => {
   );
 });
 
-// Helper to get user object by ID for head info
 const getHeadUserById = (id) => {
   return users.value.find((u) => u.id === id) || null;
 };
@@ -253,7 +297,6 @@ const submitForm = async () => {
 
     if (isEdit.value) {
       await departmentApi.update(form.id, payload);
-      // Update local department including full head user object
       const index = departments.value.findIndex((d) => d.id === form.id);
       if (index !== -1) {
         departments.value[index] = {
@@ -278,14 +321,15 @@ const submitForm = async () => {
   }
 };
 
-const deleteDepartment = async (id) => {
-  if (!confirm("Are you sure you want to delete this department?")) return;
-
+const deleteDepartment = async () => {
   try {
-    await departmentApi.delete(id);
-    departments.value = departments.value.filter((d) => d.id !== id);
+    await departmentApi.delete(deleteId.value);
+    departments.value = departments.value.filter((d) => d.id !== deleteId.value);
   } catch (error) {
     console.error("Failed to delete department:", error);
+  } finally {
+    showDeleteModal.value = false;
+    deleteId.value = null;
   }
 };
 
@@ -297,7 +341,6 @@ function closeMenu() {
   menuOpenId.value = null;
 }
 
-// Close dropdown menu on outside click
 document.addEventListener("click", () => {
   closeMenu();
 });
