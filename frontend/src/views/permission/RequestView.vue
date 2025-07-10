@@ -45,8 +45,8 @@
       <table class="min-w-full bg-white rounded-lg shadow-md border text-sm">
         <thead class="bg-blue-100 text-blue-800 uppercase font-semibold">
           <tr>
-            <th class="px-4 py-3 text-left">ID</th>
-            <th class="px-4 py-3 text-left">User name</th>
+            <th class="px-4 py-3 text-left">Display ID</th>
+            <th class="px-4 py-3 text-left">Manager Name</th>
             <th class="px-4 py-3 text-left">Permission Type</th>
             <th class="px-4 py-3 text-left">Reason</th>
             <th class="px-4 py-3 text-left">Status</th>
@@ -55,11 +55,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="permissionRequest in filteredPermissions" :key="permissionRequest.id"
+          <tr v-for="(permissionRequest, index) in filteredPermissions" :key="permissionRequest.id"
             class="border-t hover:bg-gray-100 transition duration-200">
-            <td class="px-4 py-3">{{ permissionRequest.id }}</td>
-            <td class="px-4 py-3">{{ permissionRequest.user.full_name }}</td>
-            <td class="px-4 py-3">{{ permissionRequest.permission_type.name }}</td>
+            <td class="px-4 py-3">{{ index + 1 }}</td>
+            <td class="px-4 py-3">{{ permissionRequest.user?.full_name || 'N/A' }}</td>
+            <td class="px-4 py-3">{{ permissionRequest.permission_type?.name || 'N/A' }}</td>
             <td class="px-4 py-3">{{ permissionRequest.reason }}</td>
             <td class="px-4 py-3">
               <span :class="[
@@ -79,7 +79,6 @@
                 class="p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                 :aria-expanded="actionMenuOpenId === permissionRequest.id ? 'true' : 'false'" aria-haspopup="true"
                 aria-label="Open actions menu">
-                <!-- Three dots icon -->
                 <svg class="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
                   <circle cx="10" cy="4" r="1.5" />
                   <circle cx="10" cy="10" r="1.5" />
@@ -102,8 +101,6 @@
                 </div>
               </transition>
             </td>
-
-
           </tr>
           <tr v-if="filteredPermissions.length === 0">
             <td colspan="7" class="px-4 py-6 text-center text-gray-500">
@@ -123,25 +120,26 @@
 
         <form @submit.prevent="isEditing ? updateRequest() : createRequest()">
           <div class="mb-4">
-            <label class="block mb-1 font-medium" for="user_id">User ID</label>
-            <input id="user_id" v-model="form.user_id" type="text" required class="w-full border rounded px-3 py-2" />
+            <label class="block mb-1 font-medium" for="user_id">Manager</label>
+            <select id="user_id" v-model="form.user_id" required class="w-full border rounded px-3 py-2">
+              <option value="" disabled>Select a manager</option>
+              <option v-for="manager in managers" :key="manager.id" :value="manager.id">
+                {{ manager.full_name }}
+              </option>
+            </select>
           </div>
           <div class="mb-4">
-            <label class="block mb-1 font-medium" for="permission_type_id">Permission Type ID</label>
-            <input id="permission_type_id" v-model="form.permission_type_id" type="text" required
-              class="w-full border rounded px-3 py-2" />
+            <label class="block mb-1 font-medium" for="permission_type_id">Permission Type</label>
+            <select id="permission_type_id" v-model="form.permission_type_id" required class="w-full border rounded px-3 py-2">
+              <option value="" disabled>Select a permission type</option>
+              <option v-for="type in permissionTypes" :key="type.id" :value="type.id">
+                {{ type.name }}
+              </option>
+            </select>
           </div>
           <div class="mb-4">
             <label class="block mb-1 font-medium" for="reason">Reason</label>
             <textarea id="reason" v-model="form.reason" required class="w-full border rounded px-3 py-2"></textarea>
-          </div>
-          <div class="mb-4">
-            <label class="block mb-1 font-medium" for="status">Status</label>
-            <select id="status" v-model="form.status" required class="w-full border rounded px-3 py-2">
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-            </select>
           </div>
 
           <div class="flex justify-end gap-4">
@@ -196,6 +194,9 @@ import { ref, onMounted, computed } from 'vue'
 import api from '@/plugin/axios.js'
 
 const permissionRequests = ref([])
+const users = ref([])
+const managers = ref([])
+const permissionTypes = ref([])
 const selectedStatus = ref('')
 const searchQuery = ref('')
 const loading = ref(true)
@@ -213,12 +214,13 @@ const form = ref({
 })
 
 const showDeleteConfirm = ref(null)
-
 const toast = ref({
   visible: false,
   message: '',
-  type: 'success', // or 'error'
+  type: 'success',
 })
+
+const emit = defineEmits(['new-request', 'refresh-requests'])
 
 function showToast(message, type = 'success') {
   toast.value.message = message
@@ -243,8 +245,29 @@ async function fetchRequests() {
   }
 }
 
+async function fetchUsers() {
+  try {
+    const res = await api.get('/users')
+    users.value = res.data.users
+    managers.value = users.value.filter(user => user.role_id === 3)
+  } catch (err) {
+    showToast('Failed to load users.', 'error')
+  }
+}
+
+async function fetchPermissionTypes() {
+  try {
+    const res = await api.get('/permissiontypes')
+    permissionTypes.value = res.data.data
+  } catch (err) {
+    showToast('Failed to load permission types.', 'error')
+  }
+}
+
 onMounted(() => {
   fetchRequests()
+  fetchUsers()
+  fetchPermissionTypes()
 })
 
 const filteredPermissions = computed(() => {
@@ -274,7 +297,13 @@ function openCreatePopup() {
 }
 
 function openEditPopup(request) {
-  form.value = { ...request }
+  form.value = { 
+    id: request.id,
+    user_id: request.user?.id || '',
+    permission_type_id: request.permission_type?.id || '',
+    reason: request.reason,
+    status: request.status,
+  }
   isEditing.value = true
   showPopup.value = true
 }
@@ -296,16 +325,18 @@ function resetForm() {
 
 async function createRequest() {
   try {
-    await api.post('/permissionrequests', {
+    const response = await api.post('/permissionrequests', {
       user_id: form.value.user_id,
       permission_type_id: form.value.permission_type_id,
       reason: form.value.reason,
-      status: form.value.status,
+      status: 'pending',
     })
     showToast('Created successfully!', 'success')
     showPopup.value = false
+    emit('new-request', response.data)
     fetchRequests()
   } catch (error) {
+    console.error('Failed to create request:', error)
     showToast('Failed to create request.', 'error')
   }
 }
@@ -322,13 +353,9 @@ async function updateRequest() {
     showPopup.value = false
     fetchRequests()
   } catch (error) {
+    console.error('Failed to update request:', error)
     showToast('Failed to update request.', 'error')
   }
-}
-
-function confirmDelete(id) {
-  showDeleteConfirm.value = id
-  closeActionMenu()
 }
 
 async function deleteRequest(id) {
@@ -338,9 +365,27 @@ async function deleteRequest(id) {
     showDeleteConfirm.value = null
     showToast('Deleted successfully!', 'success')
   } catch (error) {
+    console.error('Failed to delete request:', error)
     showToast('Failed to delete request.', 'error')
   }
 }
+
+async function updateRequestStatus(id, status) {
+  try {
+    await api.put(`/permissionrequests/${id}`, { status })
+    showToast(`${status.charAt(0).toUpperCase() + status.slice(1)} successfully!`, 'success')
+    fetchRequests() // Refresh the table
+    emit('refresh-requests') // Notify parent to refresh notifications
+  } catch (error) {
+    console.error(`Failed to ${status} request:`, error)
+    showToast(`Failed to ${status} request.`, 'error')
+  }
+}
+
+defineExpose({
+  updateRequestStatus,
+  fetchRequests // Expose fetchRequests for parent to call
+})
 </script>
 
 <style>

@@ -1,8 +1,8 @@
-<template>
-  <Navbar />
 
+<template>
   <div class="p-6 min-h-screen bg-gradient-to-br from-white via-teal-50 to-white w-full">
-    <!-- Top Bar: Back Button & Title -->
+    <Navbar />
+
     <div class="mb-8 flex justify-between items-center">
       <button
         @click="goBack"
@@ -41,8 +41,8 @@
       </div>
     </div>
 
-    <!-- History Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div v-if="isLoading" class="text-center text-gray-500">Loading...</div>
+    <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       <div
         class="bg-white/70 backdrop-blur shadow-xl rounded-2xl p-6 border-t-4 border-teal-400"
       >
@@ -63,67 +63,88 @@
       </div>
     </div>
 
-    <!-- History Table -->
-    <div
-      class="bg-white/80 backdrop-blur-xl shadow-lg rounded-2xl p-6 border border-teal-100 w-full overflow-x-auto"
-    >
-      <h2 class="text-xl font-semibold mb-5 text-teal-700 border-b pb-2">
-        Detailed Requests
-      </h2>
+    <RequestTable v-if="!isLoading" :requests="requests" />
 
-      <table class="min-w-full text-sm divide-y divide-gray-200">
-        <thead class="bg-teal-50 text-teal-700">
-          <tr>
-            <th class="text-left px-4 py-2 text-gray-700">Date</th>
-            <th class="text-left px-4 py-2 text-gray-700">Reason</th>
-            <th class="text-left px-4 py-2 text-gray-700">Status</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr
-            v-for="(request, index) in requests"
-            :key="index"
-            class="hover:bg-teal-50 transition"
-          >
-            <td class="px-4 py-3 text-gray-700 font-medium">{{ request.date }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ request.reason }}</td>
-            <td
-              class="px-4 py-3 font-semibold"
-              :class="{
-                'text-green-600': request.status === 'Approved',
-                'text-red-600': request.status === 'Rejected',
-                'text-yellow-600': request.status === 'Pending',
-              }"
-            >
-              {{ request.status }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Toast Notification -->
+    <transition name="toast-fade">
+      <div
+        v-if="toast.visible"
+        :class="[
+          'fixed bottom-6 right-6 px-4 py-2 rounded shadow-md text-white font-semibold select-none',
+          toast.type === 'success' ? 'bg-green-600' : 'bg-red-600',
+        ]"
+        role="alert"
+      >
+        {{ toast.message }}
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Navbar from '@/components/layout/Navbar.vue'
+import RequestTable from '@/components/user/RequestTable.vue'
+import apiInstance from '@/plugin/axios'
 
 const router = useRouter()
+const requests = ref([])
+const isLoading = ref(true)
+
+const toast = ref({
+  visible: false,
+  message: '',
+  type: 'success',
+})
+
+function showToast(message, type = 'success') {
+  toast.value.message = message
+  toast.value.type = type
+  toast.value.visible = true
+  setTimeout(() => {
+    toast.value.visible = false
+  }, 2000)
+}
+
+const fetchRequests = async () => {
+  try {
+    isLoading.value = true
+    const response = await apiInstance.get('/permissionrequests', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    })
+    requests.value = response.data.data || []
+  } catch (error) {
+    console.error('Error fetching requests:', error)
+    showToast('Failed to fetch requests.', 'error')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const total = computed(() => requests.value.length)
+const approved = computed(
+  () => requests.value.filter(r => r.status.toLowerCase() === 'approved').length
+)
+const rejected = computed(
+  () => requests.value.filter(r => r.status.toLowerCase() === 'rejected').length
+)
 
 function goBack() {
   router.back()
 }
 
-const requests = ref([
-  { date: '2025-07-01', reason: 'Medical leave', status: 'Approved' },
-  { date: '2025-07-03', reason: 'Family issue', status: 'Rejected' },
-  { date: '2025-07-05', reason: 'Travel', status: 'Pending' },
-  { date: '2025-07-10', reason: 'Personal', status: 'Approved' },
-  { date: '2025-07-12', reason: 'Training', status: 'Approved' },
-])
-
-const total = computed(() => requests.value.length)
-const approved = computed(() => requests.value.filter(r => r.status === 'Approved').length)
-const rejected = computed(() => requests.value.filter(r => r.status === 'Rejected').length)
+onMounted(fetchRequests)
 </script>
+
+<style>
+.toast-fade-enter-active,
+.toast-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.toast-fade-enter-from,
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+</style>

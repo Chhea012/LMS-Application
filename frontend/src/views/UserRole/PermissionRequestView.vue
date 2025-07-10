@@ -1,11 +1,10 @@
-<template>
-  <Navbar />
 
+<template>
   <div class="min-h-screen bg-gradient-to-br from-teal-50 via-white to-gray-50 p-6">
+    <Navbar />
+
     <div class="max-w-7xl mx-auto">
-      <!-- Top Bar: Back Button & Title -->
       <div class="flex items-center justify-between mb-8">
-        <!-- Back Button -->
         <button
           @click="goBack"
           class="group flex items-center text-sm text-white bg-teal-600 hover:bg-teal-700 shadow-md rounded-full px-5 py-2 transition-all hover:scale-105"
@@ -22,16 +21,15 @@
           Back
         </button>
 
-        <!-- Title -->
         <h2 class="text-2xl font-semibold text-teal-700">Request Permission</h2>
       </div>
 
-      <!-- Form Card -->
       <form
         @submit.prevent="submit"
         class="bg-white/80 backdrop-blur-xl shadow-lg rounded-2xl p-6 border border-teal-100"
       >
-        <!-- Permission Type -->
+        <div v-if="errorMessage" class="text-red-600 mb-4">{{ errorMessage }}</div>
+
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-1">Permission Type</label>
           <select
@@ -46,7 +44,6 @@
           </select>
         </div>
 
-        <!-- Reason -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-1">Reason</label>
           <textarea
@@ -58,7 +55,6 @@
           ></textarea>
         </div>
 
-        <!-- Date Leave -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-1">Date Leave</label>
           <input
@@ -79,7 +75,6 @@
           </div>
         </div>
 
-        <!-- Date Back -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-1">Date Back</label>
           <input
@@ -100,7 +95,6 @@
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="flex justify-end gap-4 mt-8">
           <button
             type="button"
@@ -112,25 +106,43 @@
           <button
             type="submit"
             class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            :disabled="isSubmitting"
           >
-            Submit Request
+            {{ isSubmitting ? 'Submitting...' : 'Submit Request' }}
           </button>
         </div>
       </form>
+
+      <!-- Toast Notification -->
+      <transition name="toast-fade">
+        <div
+          v-if="toast.visible"
+          :class="[
+            'fixed bottom-6 right-6 px-4 py-2 rounded shadow-md text-white font-semibold select-none',
+            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600',
+          ]"
+          role="alert"
+        >
+          {{ toast.message }}
+        </div>
+      </transition>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import Navbar from '@/components/layout/Navbar.vue'
+import apiInstance from '@/plugin/axios'
 
 const router = useRouter()
+const isSubmitting = ref(false)
+const errorMessage = ref('')
+const permissionTypes = ref([])
 
 const form = reactive({
-  user_id: 1, // Replace with actual user ID
+  user_id: localStorage.getItem('user_id') || 1,
   permission_type_id: '',
   reason: '',
   date_leave: '',
@@ -141,20 +153,60 @@ const form = reactive({
   back_afternoon: false,
 })
 
-const permissionTypes = reactive([])
+const toast = ref({
+  visible: false,
+  message: '',
+  type: 'success',
+})
+
+function showToast(message, type = 'success') {
+  toast.value.message = message
+  toast.value.type = type
+  toast.value.visible = true
+  setTimeout(() => {
+    toast.value.visible = false
+  }, 2000)
+}
 
 onMounted(async () => {
   try {
-    const res = await axios.get('/api/permission-types')
-    permissionTypes.push(...res.data)
+    const res = await apiInstance.get('/permission-types', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    })
+    permissionTypes.value = res.data.data || []
   } catch (err) {
     console.error('Failed to load permission types:', err)
+    errorMessage.value = 'Failed to load permission types. Please try again.'
+    showToast(errorMessage.value, 'error')
   }
 })
 
-function submit() {
-  console.log('Submitting:', form)
-  router.push({ name: 'UserHome' })
+async function submit() {
+  if (!form.leave_morning && !form.leave_afternoon) {
+    errorMessage.value = 'Please select at least one leave time (Morning or Afternoon).'
+    showToast(errorMessage.value, 'error')
+    return
+  }
+  if (!form.back_morning && !form.back_afternoon) {
+    errorMessage.value = 'Please select at least one return time (Morning or Afternoon).'
+    showToast(errorMessage.value, 'error')
+    return
+  }
+
+  try {
+    isSubmitting.value = true
+    await apiInstance.post('/permissionrequests', form, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    })
+    showToast('Request submitted successfully!', 'success')
+    router.push({ name: 'UserHome' })
+  } catch (err) {
+    console.error('Failed to submit request:', err)
+    errorMessage.value = 'Failed to submit request. Please try again.'
+    showToast(errorMessage.value, 'error')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 function cancel() {
@@ -165,3 +217,15 @@ function goBack() {
   router.back()
 }
 </script>
+
+<style>
+.toast-fade-enter-active,
+.toast-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.toast-fade-enter-from,
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+</style>

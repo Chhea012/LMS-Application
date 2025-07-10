@@ -44,10 +44,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import apiInstance from '@/plugin/axios'
 
 const router = useRouter()
-
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
@@ -55,16 +54,25 @@ const errorMessage = ref('')
 const login = async () => {
   errorMessage.value = ''
   try {
-    const response = await axios.post('http://127.0.0.1:8000/api/login', {
+    const response = await apiInstance.post('/login', {
       email: email.value,
       password: password.value,
     })
+
+    const { token, user } = response.data
     console.log('Login success:', response.data)
 
-    localStorage.setItem('token', response.data.token)
+    // Store token and role_id in localStorage
+    localStorage.setItem('token', token)
     localStorage.setItem('isLoggedIn', 'true')
+    localStorage.setItem('role_id', user.role_id)
 
-    router.push('/')
+    // Immediate navigation based on role
+    if (user.role_id === 4) {
+      router.push('/userhome')
+    } else {
+      router.push('/')
+    }
   } catch (error) {
     if (error.response) {
       errorMessage.value = error.response.data.message || 'Login failed'
