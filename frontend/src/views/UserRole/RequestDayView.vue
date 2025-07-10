@@ -1,6 +1,7 @@
 
 <template>
   <Navbar />
+ 
 
   <div class="p-6 min-h-screen bg-gradient-to-br from-white via-teal-50 to-white">
 
@@ -41,16 +42,6 @@
           Permission Days Summary
         </h1>
       </div>
-    </div>
-
-    <!-- Create Request Button -->
-    <div class="mb-6 flex justify-end">
-      <button
-        @click="showPopup = true"
-        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Create New Request
-      </button>
     </div>
 
     <div v-if="isLoading" class="text-center text-gray-500">Loading...</div>
@@ -117,7 +108,6 @@
         </table>
       </div>
     </div>
-
     <!-- Create Request Popup -->
     <div
       v-if="showPopup"

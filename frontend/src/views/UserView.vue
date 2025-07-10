@@ -44,17 +44,22 @@
           <td class="py-2 px-4">{{ user.email || 'N/A' }}</td>
           <td class="py-2 px-4">{{ user.role_name || 'Unknown' }}</td>
           <td class="py-2 px-4">{{ user.department_name || 'Unknown' }}</td>
-          <td class="py-2 px-4 flex gap-2">
-            <button @click="viewUser(user)" class="text-gray-600 hover:text-gray-800" aria-label="View user details" :disabled="user.isDeleting">
-              <i class="bx bx-show text-lg"></i>
+          <td class="py-2 px-4 relative">
+            <button @click="toggleDropdown(user.id)" class="text-gray-600 hover:text-gray-800" :disabled="user.isDeleting" aria-label="User actions">
+              <i class="bx bx-dots-vertical-rounded text-lg"></i>
             </button>
-            <button @click="openEditModal(user)" class="text-blue-600 hover:text-blue-800" aria-label="Edit user" :disabled="user.isDeleting">
-              <i class="bx bx-edit text-lg"></i>
-            </button>
-            <button @click="removeUserConfirmed(user.id)" class="text-red-600 hover:text-red-800" aria-label="Delete user" :disabled="user.isDeleting">
-              <i v-if="user.isDeleting" class="bx bx-loader-alt animate-spin text-lg"></i>
-              <i v-else class="bx bx-trash text-lg"></i>
-            </button>
+            <div v-if="activeDropdown === user.id" class="absolute right-4 top-8 bg-white shadow-md rounded-lg z-10 w-32 animate-fade-in">
+              <button @click="viewUser(user)" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                <i class="bx bx-show"></i> View
+              </button>
+              <button @click="openEditModal(user)" class="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 flex items-center gap-2">
+                <i class="bx bx-edit"></i> Edit
+              </button>
+              <button @click="removeUserConfirmed(user.id)" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2" :disabled="user.isDeleting">
+                <i v-if="user.isDeleting" class="bx bx-loader-alt animate-spin"></i>
+                <i v-else class="bx bx-trash"></i> Delete
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -131,7 +136,9 @@
               <label class="block text-xs mb-1 font-medium text-gray-700">Role</label>
               <div class="flex items-center gap-2">
                 <i class="bx bx-briefcase text-blue-600"></i>
-                <select v-model="form.role_id" class="w-full border px-2 py-1 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500" required>
+                <select v-model="form.role_id" class="w-full border px-2 py-1 rounded text-sm focus:ring-1്ച
+
+                ring-blue-500 focus:border-blue-500" required>
                   <option value="" disabled>Select a role</option>
                   <option v-for="role in roles" :value="role.id" :key="role.id">{{ role.role_name }}</option>
                 </select>
@@ -216,6 +223,7 @@ const formError = ref(null);
 const showViewModal = ref(false);
 const selectedUser = ref(null);
 const isDragging = ref(false);
+const activeDropdown = ref(null);
 
 const form = ref({
   full_name: '',
@@ -255,6 +263,18 @@ const fetchData = async () => {
   }
 };
 
+// Toggle dropdown
+const toggleDropdown = (userId) => {
+  activeDropdown.value = activeDropdown.value === userId ? null : userId;
+};
+
+// Close dropdown when clicking outside
+const closeDropdown = (event) => {
+  if (!event.target.closest('.relative')) {
+    activeDropdown.value = null;
+  }
+};
+
 // Form validation
 const validateForm = () => {
   if (!form.value.full_name.trim()) {
@@ -266,7 +286,7 @@ const validateForm = () => {
   if (!editing.value && !form.value.password) {
     return 'Password is required for new users.';
   }
-  if (form.value.password && form.value.password.length < 6) {
+  if (form.value.password && form.value=="") {
     return 'Password must be at least 6 characters.';
   }
   if (!form.value.role_id) {
@@ -369,12 +389,12 @@ const openEditModal = (user) => {
     email: user.email || '',
     password: '',
     role_id: user.role_id || '',
-
     department_id: user.department_id || '',
     image: null,
   };
   imagePreview.value = user.image_url || null;
   showModal.value = true;
+  activeDropdown.value = null;
 };
 
 const removeUserConfirmed = async (id) => {
@@ -391,6 +411,7 @@ const removeUserConfirmed = async (id) => {
     error.value = err.message || 'Failed to delete user.';
     notyf.error(error.value);
   }
+  activeDropdown.value = null;
 };
 
 const resetForm = () => {
@@ -437,13 +458,18 @@ const removeImage = () => {
 const viewUser = (user) => {
   selectedUser.value = user;
   showViewModal.value = true;
+  activeDropdown.value = null;
 };
 
 // Lifecycle hooks
-onMounted(fetchData);
+onMounted(() => {
+  fetchData();
+  document.addEventListener('click', closeDropdown);
+});
 
 onUnmounted(() => {
   if (imagePreview.value) URL.revokeObjectURL(imagePreview.value);
+  document.removeEventListener('click', closeDropdown);
 });
 </script>
 

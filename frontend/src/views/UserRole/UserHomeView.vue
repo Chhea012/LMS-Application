@@ -50,6 +50,7 @@
     <!-- Request Table -->
     <RequestTable :requests="requestHistory" />
   </div>
+
 </template>
 
 <script setup>

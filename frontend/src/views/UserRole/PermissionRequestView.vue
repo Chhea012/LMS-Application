@@ -1,4 +1,4 @@
-```vue
+
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -194,4 +194,3 @@ function goBack() {
     </form>
   </div>
 </template>
-```
