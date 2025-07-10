@@ -1,5 +1,10 @@
 <template>
-  <Navbar />
+  <Navbar
+    :profileOpen="profileOpen"
+    @toggle-profile="toggleProfile"
+    @toggle-sidebar="toggleSidebar"
+    @close-profile="closeProfile"
+  />
 
   <div class="p-6 bg-gradient-to-br from-teal-50 via-white to-gray-50 min-h-screen">
     <!-- Dashboard Cards -->
@@ -50,7 +55,6 @@
     <!-- Request Table -->
     <RequestTable :requests="requestHistory" />
   </div>
-
 </template>
 
 <script setup>
@@ -63,6 +67,8 @@ import DashboardCard from '@/components/user/DashboardCard.vue'
 import RequestTable from '@/components/user/RequestTable.vue'
 
 const router = useRouter()
+const profileOpen = ref(false)
+const sidebarOpen = ref(false)
 
 // Sample request history (mocked)
 const requestHistory = ref([
@@ -82,14 +88,30 @@ const rejectedRequests = computed(
 
 // Navigation handlers
 function goToRequestPage() {
+  profileOpen.value = false // Close dropdown on navigation
   router.push({ name: 'RequestPermission' })
 }
 
 function goToRequestDays() {
+  profileOpen.value = false // Close dropdown on navigation
   router.push({ name: 'RequestDays' })
 }
 
 function goToHistoryDetail() {
+  profileOpen.value = false // Close dropdown on navigation
   router.push({ name: 'HistoryDetail' })
+}
+
+// Navbar event handlers
+function toggleProfile() {
+  profileOpen.value = !profileOpen.value
+}
+
+function toggleSidebar() {
+  sidebarOpen.value = !sidebarOpen.value
+}
+
+function closeProfile() {
+  profileOpen.value = false
 }
 </script>

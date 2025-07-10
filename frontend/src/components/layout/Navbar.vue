@@ -88,7 +88,7 @@
         <transition name="fade">
           <div
             v-if="profileOpen"
-            class="profile-dropdown absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50"
+            class="profile-dropdown absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-[100]"
             @click.stop
           >
             <div
@@ -114,7 +114,7 @@
               <RouterLink
                 to="/profile-settings"
                 @click="closeDropdown"
-                class="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-100"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Profile Settings
               </RouterLink>
@@ -122,7 +122,7 @@
                 v-if="[1, 2, 3].includes(user.role_id)"
                 to="/"
                 @click="closeDropdown"
-                class=" hidden px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                class="block px-4 py-2 hidden text-sm text-gray-700 hover:bg-gray-100"
               >
                 Dashboard
               </RouterLink>
@@ -130,7 +130,7 @@
                 v-if="[1, 2, 3].includes(user.role_id)"
                 to="/department"
                 @click="closeDropdown"
-                class="hidden px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                class="block px-4 py-2  hidden text-sm text-gray-700 hover:bg-gray-100"
               >
                 Departments
               </RouterLink>
@@ -138,25 +138,9 @@
                 v-if="[1, 2, 3].includes(user.role_id)"
                 to="/user"
                 @click="closeDropdown"
-                class="hidden px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                class="block px-4 py-2 text-sm hidden text-gray-700 hover:bg-gray-100"
               >
                 Users
-              </RouterLink>
-              <RouterLink
-                v-if="user.role_id === 4"
-                to="/userhome"
-                @click="closeDropdown"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                My Dashboard
-              </RouterLink>
-              <RouterLink
-                v-if="user.role_id === 4"
-                to="/request-permission"
-                @click="closeDropdown"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Request Permission
               </RouterLink>
               <RouterLink
                 v-if="user.role_id === 4"
@@ -207,7 +191,10 @@ const signOut = async () => {
 }
 
 const props = defineProps({
-  profileOpen: Boolean,
+  profileOpen: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['toggle-profile', 'toggle-sidebar', 'close-profile'])
@@ -231,8 +218,10 @@ onMounted(async () => {
       ...res.data,
       role_id: res.data.role_id || parseInt(localStorage.getItem('role_id'), 10),
     }
+    console.log('User loaded:', user.value) // Debug log
   } catch (error) {
     console.error('Failed to load user:', error)
+    alert('Failed to load user data: ' + (error.response?.data?.message || error.message))
   }
 
   window.addEventListener('click', handleClickOutside)
