@@ -32,6 +32,7 @@
 # Vite cache (if using Vite)
 /frontend/.vite/
 /backend/.vite/
+/node_modules/
 
 # Composer lock file (optional)
 # backend/composer.lock
