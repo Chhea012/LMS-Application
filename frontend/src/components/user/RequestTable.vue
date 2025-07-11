@@ -1,4 +1,3 @@
-```vue
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import apiInstance from '@/plugin/axios'
@@ -8,6 +7,8 @@ const permissionTypes = ref([])
 const isLoading = ref(true)
 const errorMessage = ref('')
 const currentUserId = ref(null)
+const showReasonPopup = ref(false)
+const currentReason = ref('')
 
 // Fetch logged-in user’s ID
 const fetchCurrentUser = async () => {
@@ -116,6 +117,18 @@ const formatTimeOfDay = (morning, afternoon) => {
   if (afternoon) times.push('Afternoon')
   return times.length > 0 ? times.join(', ') : 'N/A'
 }
+
+// Open reason popup
+function openReasonPopup(reason) {
+  currentReason.value = reason || 'N/A'
+  showReasonPopup.value = true
+}
+
+// Close reason popup
+function closeReasonPopup() {
+  showReasonPopup.value = false
+  currentReason.value = ''
+}
 </script>
 
 <template>
@@ -163,7 +176,11 @@ const formatTimeOfDay = (morning, afternoon) => {
             <td class="px-4 py-2 text-gray-700 font-medium">
               {{ getPermissionTypeName(request.permission_type_id) }}
             </td>
-            <td class="px-4 py-2 text-gray-700 font-medium">{{ request.reason || 'N/A' }}</td>
+            <td class="px-4 py-2 text-gray-700 font-medium">
+              <button @click="openReasonPopup(request.reason)" class="text-blue-600 hover:underline">
+                View Reason
+              </button>
+            </td>
             <td class="px-4 py-2 text-gray-700 font-medium">
               {{ request.date_leave || 'N/A' }}
             </td>
@@ -199,6 +216,24 @@ const formatTimeOfDay = (morning, afternoon) => {
         </tbody>
       </table>
     </div>
+
+    <!-- Reason View Popup -->
+    <div v-if="showReasonPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+        <h3 class="text-xl font-semibold mb-4">Reason Details</h3>
+        <p class="mb-4 text-gray-700">{{ currentReason || 'N/A' }}</p>
+        <div class="flex justify-end">
+          <button @click="closeReasonPopup" class="px-4 py-2 border rounded hover:bg-gray-100">
+            Close
+          </button>
+        </div>
+        <button @click="closeReasonPopup"
+          class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-2xl font-bold leading-none"
+          aria-label="Close reason popup">
+          ×
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -213,4 +248,3 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
 }
 </style>
-```

@@ -1,11 +1,11 @@
-
 <template>
-  <Navbar />
- 
+  <Navbar
+    :profileOpen="profileOpen"
+    @toggle-profile="toggleProfile"
+    @close-profile="closeProfile"
+  />
 
   <div class="p-6 min-h-screen bg-gradient-to-br from-white via-teal-50 to-white">
-
-
     <div class="mb-8 flex justify-between items-center">
       <button
         @click="goBack"
@@ -245,6 +245,7 @@ const summary = ref({
   remainingDays: 5,
 })
 const permissionTypes = ref([])
+const profileOpen = ref(false)
 
 const form = reactive({
   user_id: localStorage.getItem('user_id') || 1,
@@ -271,6 +272,14 @@ function showToast(message, type = 'success') {
   setTimeout(() => {
     toast.value.visible = false
   }, 2000)
+}
+
+function toggleProfile() {
+  profileOpen.value = !profileOpen.value
+}
+
+function closeProfile() {
+  profileOpen.value = false
 }
 
 const fetchMonthlyData = async () => {
@@ -350,6 +359,7 @@ async function createRequest() {
 }
 
 function goBack() {
+  profileOpen.value = false // Close dropdown on navigation
   router.back()
 }
 

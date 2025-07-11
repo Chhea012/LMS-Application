@@ -1,8 +1,11 @@
 <template>
-  <Navbar />
+  <Navbar
+    :profileOpen="profileOpen"
+    @toggle-profile="toggleProfile"
+    @close-profile="closeProfile"
+  />
 
   <div class="p-6 min-h-screen bg-gradient-to-br from-white via-teal-50 to-white">
-
     <div class="max-w-7xl mx-auto">
       <div class="flex items-center justify-between mb-8">
         <button
@@ -81,7 +84,6 @@
       </transition>
     </div>
   </div>
-
 </template>
 
 <script setup>
@@ -89,11 +91,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Navbar from '@/components/layout/Navbar.vue'
 import RequestTable from '@/components/user/RequestTable.vue'
-import api from '@/plugin/axios'
+import apiInstance from '@/plugin/axios'
 
 const router = useRouter()
 const requests = ref([])
 const isLoading = ref(true)
+const profileOpen = ref(false)
 
 const toast = ref({
   visible: false,
@@ -110,10 +113,18 @@ function showToast(message, type = 'success') {
   }, 2000)
 }
 
+function toggleProfile() {
+  profileOpen.value = !profileOpen.value
+}
+
+function closeProfile() {
+  profileOpen.value = false
+}
+
 const fetchRequests = async () => {
   try {
     isLoading.value = true
-    const response = await api.get('/permissionrequests', {
+    const response = await apiInstance.get('/permissionrequests', {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     })
     requests.value = response.data || []
@@ -134,6 +145,7 @@ const rejected = computed(
 )
 
 function goBack() {
+  profileOpen.value = false // Close dropdown on navigation
   router.back()
 }
 
